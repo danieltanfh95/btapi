@@ -12,21 +12,30 @@ router.get('/', function(req, res) {
     }else if(postdata.title){
     //Get all avalaible volumes
     if(postdata.volume=="available"){
-      download("http://baka-tsuki.org/project/api.php?action=parse&prop=sections&page="+postdata.title, function(resd){
-        //Only match titles with "Volume {number.number}"
-        var volumelist=resd.match(/Volume \d+\.{0,1}\d?/g);
-        if(volumelist){
-          for(var i=0;i<volumelist.length;i++){
-            volumelist[i]=volumelist[i].replace(/ /g,"_");
+      download("http://baka-tsuki.org/project/api.php?action=parse&format=json&prop=sections&page="+postdata.title, function(resd){
+        //This shows all the volumes available for the 
+        var data=JSON.parse(resd);
+        var links={};
+        var pushing="";
+        if(data.parse){
+          data=data.parse.sections;
+          for(var i=0;i<data.length;i++){
+            if(data[i].line.match(/\sby\s/g) && data[i].toclevel==1){
+              links[data[i].line]=[];
+              pushing=data[i].line;
+            }else if(!data[i].line.match(/\sby\s/g) && data[i].toclevel==1){
+              pushing="";
+            }else if(data[i].toclevel==2 && pushing){
+              links[pushing].push(data[i].line);
+            }
           }
         }        
-        res.json(volumelist);
+        res.json(links);
       });
     }else if (postdata.volume.match(/\d+\.{0,1}\d?/g)){
-      //First check if volume is available
-
       if(!postdata.chapter){
         //If chapter information is not available
+        //Some volumes are formatted differently as Volume1 and Volume_1
         download("http://baka-tsuki.org/project/api.php?action=parse&prop=sections&format=json&page="+
               postdata.title+":Volume_"+postdata.volume, function(resd){
                 //res.json(JSON.parse(resd));                
@@ -42,12 +51,32 @@ router.get('/', function(req, res) {
                     res.json(links);                    
                   }
                 }else{
-                  res.json(JSON.parse(resd).error);
+                  //Start fall-catch section here for Volume{number}
+                  download("http://baka-tsuki.org/project/api.php?action=parse&prop=sections&format=json&page="+
+                    postdata.title+":Volume"+postdata.volume, function(resd){
+                      //res.json(JSON.parse(resd));                
+                      if(!JSON.parse(resd).error){
+                        var links=[];
+                        if(JSON.parse(resd).parse){
+                          var data=JSON.parse(resd).parse.sections;
+                          for(var i=0;i<data.length;i++){
+                            if(links.indexOf(data[i].fromtitle)<0){
+                              links.push(data[i].fromtitle);
+                            }
+                          }
+                          res.json(links);                    
+                        }
+                      }else{
+                        res.json(JSON.parse(resd).error);
+                      }
+                    });  
+                  //End section
                 }
               });   
       }      
     }else{
       //Here is the code for side story volumes
+      //Herein lies the magical realm where chaos reigns supreme
     }
   }
 
