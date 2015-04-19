@@ -9,10 +9,10 @@ router.get('/', function(req, res) {
   //if title information is available
   if(!postdata.volume){
       res.json("Please show which volume you want.");
-    }else if(postdata.lntitle){
+    }else if(postdata.title){
     //Get all avalaible volumes
     if(postdata.volume=="available"){
-      download("http://baka-tsuki.org/project/api.php?action=parse&prop=sections&page="+postdata.lntitle, function(resd){
+      download("http://baka-tsuki.org/project/api.php?action=parse&prop=sections&page="+postdata.title, function(resd){
         //Only match titles with "Volume {number.number}"
         var volumelist=resd.match(/Volume \d+\.{0,1}\d?/g);
         if(volumelist){
@@ -28,7 +28,7 @@ router.get('/', function(req, res) {
       if(!postdata.chapter){
         //If chapter information is not available
         download("http://baka-tsuki.org/project/api.php?action=parse&prop=sections&format=json&page="+
-              postdata.lntitle+":Volume_"+postdata.volume, function(resd){
+              postdata.title+":Volume_"+postdata.volume, function(resd){
                 //res.json(JSON.parse(resd));                
                 if(!JSON.parse(resd).error){
                   var links=[];

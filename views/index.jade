@@ -1,5 +1,28 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h2 Baka Tsuki API
+  h5 
+    | Welcome to the new 
+    b REST API 
+    | centre. I'm planning to cleanup the current API provided by mediawiki 
+    | so that there would be a unified API for accessing Baka Tsuki data.
+
+  h3 Parameters
+  h4 title[={valid_title}] 
+  code /api?lntitle=Date_A_Live
+  p (STRING) "Please show which volume you want."
+
+  h4 volume[=available, {volume_number}] 
+  code /api?lntitle=Date_A_Live&volume=1
+  p (LIST) chapters available for volume 1
+  code /api?lntitle=Date_A_Live&volume=available
+  p 
+    | (LIST) volumes available for the title. 
+    | Note: In the Baka Tsuki page, the section header must be fulfill the regex 
+    code /Volume \d+\.{0,1}\d?/g
+  code /api?lntitle=Date_A_Live&volume=10000000000000000000
+  p
+    | (JSON) Error data
+
+
