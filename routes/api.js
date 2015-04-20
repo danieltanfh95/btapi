@@ -35,13 +35,14 @@ router.get('/',function(req,res){
           //console.log(serieskey);
           for(var volumekey in data.volume[serieskey]){
             //console.log(volumekey);
-            var chapterlinks=$("h3:contains('"+volumekey+"')").next().find("a");
+            //Headings denote the end of the section.
+            var walker=$("h3:contains('"+volumekey+"')").nextUntil($(":header"));
+            var chapterlinks=walker.find("a");
             //console.log(chapterlinks);
             chapterlinks.each(function(){
-              //console.log($(this).attr('title'));
-              //console.log($(this).attr('href'));
               data.volume[serieskey][volumekey][$(this).attr('title')]=$(this).attr('href');
             });
+            
           }
         }
         //Data now contains links to chapters within available volumes.
