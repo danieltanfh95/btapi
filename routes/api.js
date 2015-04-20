@@ -146,7 +146,7 @@ function seriesTitleFilterByDownload(req,res){
             //Prepare nested JSON format for volume list for each series.     
             data.volume[seriesname]={};
             for(var key in volumesnames){
-              data.volume[seriesname][stripNumbering(volumesnames[key])]={};
+              data.volume[seriesname][stripNumbering(volumesnames[key])]=[];
             };
           }          
         })
@@ -161,10 +161,12 @@ function seriesTitleFilterByDownload(req,res){
             headinglinks.each(function(){
               //Reject links to edit the page or template and resource links.
               if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
-                data.volume[serieskey][volumekey][$(this).attr('title')]={};
-                data.volume[serieskey][volumekey][$(this).attr('title')].link=$(this).attr('href');
+                var chapterdata={};
+                chapterdata.title=$(this).attr('title');
+                chapterdata.link=$(this).attr('href');
                 var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
-                data.volume[serieskey][volumekey][$(this).attr('title')].linktype=linktype;
+                chapterdata.linktype=linktype;
+                data.volume[serieskey][volumekey].push(chapterdata);
                 //Actually this extra layer can be removed, but then this means that the client must
                 //Understand the type of link baka tsuki uses, which defeats the purpose of abstraction.
               } 
@@ -177,10 +179,12 @@ function seriesTitleFilterByDownload(req,res){
               //Remove red links to pages that does not exist too.              
               if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
                 var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).text();
-                data.volume[serieskey][volumekey][titletext]={};
-                data.volume[serieskey][volumekey][titletext].link=$(this).attr('href');
+                var chapterdata={};
+                chapterdata.title=titletext;
+                chapterdata.link=$(this).attr('href');
                 var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
-                data.volume[serieskey][volumekey][titletext].linktype=linktype;
+                chapterdata.linktype=linktype;
+                data.volume[serieskey][volumekey].push(chapterdata);
               }
             });
             
