@@ -101,7 +101,7 @@ function seriesTitleFilterByDownload(req,res){
 
         //Preload the data for the light novel
         data.title=jsondata.parse.title;
-        data.volume={};
+        data.sections=[];
         var status= $(":contains('Project')").text().match(/HALTED|IDLE|ABANDONED|WARNING/i);
         data.status=status ? status[0].toLowerCase() : "active";
         data.author="";
@@ -143,20 +143,27 @@ function seriesTitleFilterByDownload(req,res){
             if(authorname && authorname[1]){
               data.author=authorname[1];
             }       
-            //Prepare nested JSON format for volume list for each series.     
-            data.volume[seriesname]={};
+            //Prepare nested JSON format for volume list for each series.  
+            var seriesdata={};
+            seriesdata.title= seriesname;
+            seriesdata.books=[];            
             for(var key in volumesnames){
-              data.volume[seriesname][stripNumbering(volumesnames[key])]=[];
+              var volumedata={};
+              volumedata.title=stripNumbering(volumesnames[key]);
+              volumedata.chapters=[];
+              seriesdata.books.push(volumedata);
             };
+            data.sections.push(seriesdata);
           }          
         })
         //Search for available chapters and their interwikilinks from the page.
-        for(var serieskey in data.volume){
+        for(var serieskey in data.sections){
           //The special case of Moonlight sculptor will not be covered as it is hosted outside of BT
-          for(var volumekey in data.volume[serieskey]){
+          for(var volumekey in data.sections[serieskey].books){
             //First search for links in the heading.
             //This includes full text page versions.
-            var heading=$(":header:contains('"+volumekey+"')").first();
+            console.log
+            var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title+"')").first();
             var headinglinks=heading.find('a');
             headinglinks.each(function(){
               //Reject links to edit the page or template and resource links.
@@ -166,7 +173,8 @@ function seriesTitleFilterByDownload(req,res){
                 chapterdata.link=$(this).attr('href');
                 var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
                 chapterdata.linktype=linktype;
-                data.volume[serieskey][volumekey].push(chapterdata);
+                data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
+                console.log(data.sections[serieskey].books[volumekey].chapters);
                 //Actually this extra layer can be removed, but then this means that the client must
                 //Understand the type of link baka tsuki uses, which defeats the purpose of abstraction.
               } 
@@ -184,20 +192,21 @@ function seriesTitleFilterByDownload(req,res){
                 chapterdata.link=$(this).attr('href');
                 var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
                 chapterdata.linktype=linktype;
-                data.volume[serieskey][volumekey].push(chapterdata);
+                data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
+                console.log(data.sections[serieskey].books[volumekey].chapters);
               }
             });
             
           }
           //This covers the special case where the series contains direct links to stories instead of volumes.
           //Kino no tabi
-          if( Object.keys(data.volume[serieskey]).length<1){
+          if( Object.keys(data.sections[serieskey]).length<1){
             //console.log(serieskey);
             var walker=$(":header:contains('"+serieskey+"')").nextUntil($(":header"));
             var chapterlinks=walker.find("a");
             chapterlinks.each(function(){
               if(!$(this).attr('href').match(/\.\w+$/g)){
-                data.volume[serieskey][$(this).attr('title')]=$(this).attr('href');
+                data.sections[serieskey][$(this).attr('title')]=$(this).attr('href');
               }              
             });
           }
@@ -209,23 +218,23 @@ function seriesTitleFilterByDownload(req,res){
 
         // filter by series
         if(postdata.series){
-          for(var serieskey in data.volume){
+          for(var serieskey in data.sections){
             //Case insensitive search
             //No url sanitisation so users can use regex search
             var re = new RegExp(postdata.series, 'i');
             if(!serieskey.match(re)){
-              delete data.volume[serieskey];
+              delete data.sections[serieskey];
             }
           }
         }
 
         //filter by volume
         if(postdata.volume){
-          for(var serieskey in data.volume){
-            for(var volumekey in data.volume[serieskey]){
+          for(var serieskey in data.sections){
+            for(var volumekey in data.sections[serieskey]){
               var re = new RegExp(postdata.volume, 'i');
               if(!volumekey.match(re)){
-                delete data.volume[serieskey][volumekey];
+                delete data.sections[serieskey][volumekey];
               }
             }
           }
@@ -233,12 +242,12 @@ function seriesTitleFilterByDownload(req,res){
 
         //convenience filter: By volume number
         if(postdata.volumeno){
-          for(var serieskey in data.volume){
-            for(var volumekey in data.volume[serieskey]){
+          for(var serieskey in data.sections){
+            for(var volumekey in data.sections[serieskey]){
               //Non number input will be removed
               var re = new RegExp("volume ?"+postdata.volumeno.match(/\d+/g)+" ", 'i');
               if(!volumekey.match(re)){
-                delete data.volume[serieskey][volumekey];
+                delete data.sections[serieskey][volumekey];
               }
             }
           }

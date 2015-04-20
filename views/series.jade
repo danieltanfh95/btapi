@@ -1,0 +1,69 @@
+extends layout
+
+block content
+  h4 Series Search - Filter Parameters
+
+  h5 By title
+  a(href="/api?title=Zero_no_Tsukaima")
+    /api?title=Zero_no_Tsukaima 
+  p 
+    | This parameter 
+    b must be present 
+    | to continue.
+
+  h5 By series 
+  a(href="/api?title=Chrome_Shelled_Regios&series=chrome|regios")
+    /api?title=Chrome_Shelled_Regios&series=chrome|regios 
+  p 
+    | This parameter can be a 
+    b regex 
+    | of the series name. The example above uses the pipe character.
+
+  h5 By volume
+  a(href="/api?title=Chrome_Shelled_Regios&series=chrome&volume=15|log")
+    /api?title=Chrome_Shelled_Regios&series=chrome&volume=15|log 
+  p 
+    | This parameter can be a 
+    b regex 
+    | of the volume name, which includes the volume number. The example above uses the pipe character.
+
+  h5 By volume number
+  a(href="/api?title=Chrome_Shelled_Regios&series=chrome&volumeno=1")
+    /api?title=Chrome_Shelled_Regios&series=chrome&volumeno=1 
+  p 
+    | This parameter must be a 
+    b number
+    | . Other characters will be removed.
+
+
+  br
+
+  h4 Series Search - JSON properties
+
+  h5 title
+  p (STRING) The title of the light novel
+
+  h5 status
+  p
+    | (STRING)The translation status of the light novel -- 
+    b active, idle, halted, abandoned, warning.
+  p
+    | Note: Still unable to differentiate between completed and active, 
+    | since the data is not available in the wiki text.
+
+  h5 author
+  p (STRING) The author of the light novel
+
+  h5 synopsis 
+  p (STRING) The synopsis of the light novel
+  p Note: If synopsis heading unavailable, it will show all paragraphs with the title.
+
+  h5 volumes
+  p 
+    | (JSON) The light novel series available. The data is provided as 
+    b nested JSON. 
+    | Each series contains a list of volumes and each volume contains a list of chapters. 
+  p 
+    | Each chapter contains the 
+    b wiki link 
+    | to the page.
