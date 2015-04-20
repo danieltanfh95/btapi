@@ -6,7 +6,7 @@ var router = express.Router();
 /* New parsing method */
 router.get('/',function(req,res){
   seriesTitleFilter(req,res);
-  console.log(res);
+  //console.log(res);
 })
 
 function seriesTitleFilter(req,res){
