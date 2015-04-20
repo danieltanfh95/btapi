@@ -3,84 +3,100 @@ var cheerio= require('cheerio');
 var http=require('http');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res) {
+/* New parsing method */
+router.get('/',function(req,res){
   var postdata=req.query;
-  //if title information is available
-  if(!postdata.volume){
-      res.json("Please show which volume you want.");
-    }else if(postdata.title){
-    //Get all avalaible volumes
-    if(postdata.volume=="available"){
-      download("http://baka-tsuki.org/project/api.php?action=parse&format=json&prop=sections&page="+postdata.title, function(resd){
-        //This shows all the volumes available for the 
-        var data=JSON.parse(resd);
-        var links={};
+  if(postdata.title){
+    download("http://baka-tsuki.org/project/api.php?action=parse&format=json&prop=text&page="+postdata.title, function(resd){
+      var data={};
+      var jsondata=JSON.parse(resd);
+
+      if(jsondata.parse && jsondata.parse.text){
+        var $=cheerio.load(jsondata.parse.text["*"]);
+
+        data.title=jsondata.parse.title;
+        data.volume={};
+        //Push volumes first
         var pushing="";
-        if(data.parse){
-          data=data.parse.sections;
-          for(var i=0;i<data.length;i++){
-            if(data[i].line.match(/\sby\s/g) && data[i].toclevel==1){
-              links[data[i].line]=[];
-              pushing=data[i].line;
-            }else if(!data[i].line.match(/\sby\s/g) && data[i].toclevel==1){
-              pushing="";
-            }else if(data[i].toclevel==2 && pushing){
-              links[pushing].push(data[i].line);
+        $(".toc ul li").each(function(){          
+          if($(this).text().match(/\sby\s/g) && $(this).hasClass("toclevel-1")){            
+            var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
+            var volumesnames=volumelist.slice(1,volumelist.length);
+            var seriesname=stripNumbering(volumelist[0]);
+            data.volume[seriesname]={};
+            for(var key in volumesnames){
+              data.volume[seriesname][stripNumbering(volumesnames[key])]={};
+            };
+          }          
+        })
+        //Now we search for available chapters
+        for(var serieskey in data.volume){
+          //var header=$("h3:contains")
+          //console.log(serieskey);
+          for(var volumekey in data.volume[serieskey]){
+            //console.log(volumekey);
+            var chapterlinks=$("h3:contains('"+volumekey+"')").next().find("a");
+            //console.log(chapterlinks);
+            chapterlinks.each(function(){
+              //console.log($(this).attr('title'));
+              //console.log($(this).attr('href'));
+              data.volume[serieskey][volumekey][$(this).attr('title')]=$(this).attr('href');
+            });
+          }
+        }
+        //Data now contains links to chapters within available volumes.
+        //Now add a filter into the data
+        //filter by series
+        if(postdata.series){
+          for(var serieskey in data.volume){
+            //Case insensitive search
+            //No sanitisation means users can use regex search
+            var re = new RegExp(postdata.series, 'i');
+            //console.log(serieskey);
+            //console.log(postdata.series);
+            if(!serieskey.match(re)){
+              delete data.volume[serieskey];
             }
           }
-        }        
-        res.json(links);
-      });
-    }else if (postdata.volume.match(/\d+\.{0,1}\d?/g)){
-      if(!postdata.chapter){
-        //If chapter information is not available
-        //Some volumes are formatted differently as Volume1 and Volume_1
-        download("http://baka-tsuki.org/project/api.php?action=parse&prop=sections&format=json&page="+
-              postdata.title+":Volume_"+postdata.volume, function(resd){
-                //res.json(JSON.parse(resd));                
-                if(!JSON.parse(resd).error){
-                  var links=[];
-                  if(JSON.parse(resd).parse){
-                    var data=JSON.parse(resd).parse.sections;
-                    for(var i=0;i<data.length;i++){
-                      if(links.indexOf(data[i].fromtitle)<0){
-                        links.push(data[i].fromtitle);
-                      }
-                    }
-                    res.json(links);                    
-                  }
-                }else{
-                  //Start fall-catch section here for Volume{number}
-                  download("http://baka-tsuki.org/project/api.php?action=parse&prop=sections&format=json&page="+
-                    postdata.title+":Volume"+postdata.volume, function(resd){
-                      //res.json(JSON.parse(resd));                
-                      if(!JSON.parse(resd).error){
-                        var links=[];
-                        if(JSON.parse(resd).parse){
-                          var data=JSON.parse(resd).parse.sections;
-                          for(var i=0;i<data.length;i++){
-                            if(links.indexOf(data[i].fromtitle)<0){
-                              links.push(data[i].fromtitle);
-                            }
-                          }
-                          res.json(links);                    
-                        }
-                      }else{
-                        res.json(JSON.parse(resd).error);
-                      }
-                    });  
-                  //End section
-                }
-              });   
-      }      
-    }else{
-      //Here is the code for side story volumes
-      //Herein lies the magical realm where chaos reigns supreme
-    }
-  }
+        }
+        //filter by volume
+        if(postdata.volume){
+          for(var serieskey in data.volume){
+            for(var volumekey in data.volume[serieskey]){
+              //Same method is used so users can search by numbers and names
+              var re = new RegExp(postdata.volume, 'i');
+              if(!volumekey.match(re)){
+                delete data.volume[serieskey][volumekey];
+              }
+            }
+          }
+        }
 
-});
+        //convenience filter: By volume number
+        if(postdata.volumeno){
+          for(var serieskey in data.volume){
+            for(var volumekey in data.volume[serieskey]){
+              //Same method is used so users can search by numbers and names
+              var re = new RegExp("volume ?"+postdata.volumeno.match(/\d+/g)+" ", 'i');
+              if(!volumekey.match(re)){
+                delete data.volume[serieskey][volumekey];
+              }
+            }
+          }
+        }
+        res.send(data);        
+      }      
+    });
+  }else{
+    res.send("Please show which volume you want.")
+  }
+})
+
+
+function stripNumbering(line){
+  line=line.replace(/^\s+|\s+$/g, '').split(/ /g);
+  return line.slice(1,line.length).join(" ");
+}
 
 function download(url, callback) {
   http.get(url, function(res) {
