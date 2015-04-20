@@ -27,6 +27,32 @@ function seriesTitleFilterByDownload(req,res,data){
         var status= $(":contains('Project')").text().match(/HALTED|IDLE|ABANDONED|WARNING/i);
         data.status=status ? status[0].toLowerCase() : "active";
         data.author="";
+        
+        var synopsiswalk = $(":header").filter(function(){
+          return $(this).text().match(/synopsis/i)!=null;
+        }).nextUntil($(":header")); 
+        var synopsisstring="";
+        synopsiswalk.each(function(){  
+          if($(this).text()){
+            //console.log(synopsisstring, $(this).text());
+            synopsisstring+=$(this).text();
+          }          
+        })
+        //Placing empty string in JSON will result in undefined.
+        data.synopsis=synopsisstring;
+
+        //If synopsis not found, get the paragraphs containing the title instead.
+        if(synopsisstring=="") {          
+          synopsiswalk=$("p:contains('"+data.title+"')");
+          synopsisstring=synopsiswalk.text();
+          synopsiswalk=synopsiswalk.nextUntil($(":not(p)"));
+          synopsiswalk.each(function(){  
+            if($(this).text()){
+              synopsisstring+=$(this).text();
+            }          
+          })
+          data.synopsis=synopsisstring;
+        }
 
         //Get data about available volumes from the toc
         $(".toc ul li").each(function(){          
@@ -56,7 +82,7 @@ function seriesTitleFilterByDownload(req,res,data){
             var headinglinks=heading.find('a');
             headinglinks.each(function(){
               //Reject links to edit the page or template and resource links.
-              if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w+$/g)){
+              if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
                 data.volume[serieskey][volumekey][$(this).attr('title')]=$(this).attr('href');
               } 
             });
@@ -65,7 +91,7 @@ function seriesTitleFilterByDownload(req,res,data){
             var chapterlinks=walker.find("a");
             chapterlinks.each(function(){
               //Remove red links to pages that does not exist too.
-              if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w+$/g)){
+              if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
                 data.volume[serieskey][volumekey][$(this).attr('title')]=$(this).attr('href');
               }             
             });
