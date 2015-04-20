@@ -5,11 +5,11 @@ var router = express.Router();
 
 /* New parsing method */
 router.get('/',function(req,res){
-  seriesTitleFilter(req,res);
+  seriesTitleFilterByDownload(req,res);
   //console.log(res);
 })
 
-function seriesTitleFilter(req,res){
+function seriesTitleFilterByDownload(req,res,data){
   var postdata=req.query;
 
   // Continue only if series title is available.
