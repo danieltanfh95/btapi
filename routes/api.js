@@ -40,7 +40,9 @@ router.get('/',function(req,res){
             var chapterlinks=walker.find("a");
             //console.log(chapterlinks);
             chapterlinks.each(function(){
-              data.volume[serieskey][volumekey][$(this).attr('title')]=$(this).attr('href');
+              if(!$(this).attr('href').match(/\.\w+$/g)){
+                data.volume[serieskey][volumekey][$(this).attr('title')]=$(this).attr('href');
+              }              
             });
             
           }
