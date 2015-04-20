@@ -6,8 +6,10 @@ var router = express.Router();
 /* New parsing method */
 router.get('/',function(req,res){
   seriesTitleFilterByDownload(req,res);
-  seriesLanguageFilterByDownload(req,res);
   //console.log(res);
+})
+router.get('/category',function(req,res){
+  seriesLanguageFilterByDownload(req,res);
 })
 
 function seriesLanguageFilterByDownload(req,res){
@@ -154,22 +156,32 @@ function seriesTitleFilterByDownload(req,res){
           for(var volumekey in data.volume[serieskey]){
             //First search for links in the heading.
             //This includes full text page versions.
-            var heading=$(":header:contains('"+volumekey+"')");
+            var heading=$(":header:contains('"+volumekey+"')").first();
             var headinglinks=heading.find('a');
             headinglinks.each(function(){
               //Reject links to edit the page or template and resource links.
               if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
-                data.volume[serieskey][volumekey][$(this).attr('title')]=$(this).attr('href');
+                data.volume[serieskey][volumekey][$(this).attr('title')]={};
+                data.volume[serieskey][volumekey][$(this).attr('title')].link=$(this).attr('href');
+                var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
+                data.volume[serieskey][volumekey][$(this).attr('title')].linktype=linktype;
+                //Actually this extra layer can be removed, but then this means that the client must
+                //Understand the type of link baka tsuki uses, which defeats the purpose of abstraction.
               } 
             });
             //Walk through the following sections for links until the next heading.
             var walker=heading.nextUntil($(":header"));
             var chapterlinks=walker.find("a");
+            //console.log(heading.text());
             chapterlinks.each(function(){
-              //Remove red links to pages that does not exist too.
-              if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
-                data.volume[serieskey][volumekey][$(this).attr('title')]=$(this).attr('href');
-              }             
+              //Remove red links to pages that does not exist too.              
+              if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
+                var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).text();
+                data.volume[serieskey][volumekey][titletext]={};
+                data.volume[serieskey][volumekey][titletext].link=$(this).attr('href');
+                var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
+                data.volume[serieskey][volumekey][titletext].linktype=linktype;
+              }
             });
             
           }
