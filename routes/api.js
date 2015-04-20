@@ -105,6 +105,8 @@ function seriesTitleFilterByDownload(req,res){
         var status= $(":contains('Project')").text().match(/HALTED|IDLE|ABANDONED|WARNING/i);
         data.status=status ? status[0].toLowerCase() : "active";
         data.author="";
+        data.synopsis="";
+        data.cover="";
         
         var synopsiswalk = $(":header").filter(function(){
           return $(this).text().match(/synopsis/i)!=null;
@@ -132,6 +134,7 @@ function seriesTitleFilterByDownload(req,res){
           data.synopsis=synopsisstring;
         }
 
+        //Completed Preloading of Data
         //Get data about available volumes from the toc
         $(".toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
@@ -162,7 +165,6 @@ function seriesTitleFilterByDownload(req,res){
           for(var volumekey in data.sections[serieskey].books){
             //First search for links in the heading.
             //This includes full text page versions.
-            console.log
             var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title+"')").first();
             var headinglinks=heading.find('a');
             headinglinks.each(function(){
@@ -170,11 +172,10 @@ function seriesTitleFilterByDownload(req,res){
               if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
                 var chapterdata={};
                 chapterdata.title=$(this).attr('title');
-                chapterdata.link=$(this).attr('href');
+                chapterdata.link=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
                 var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
                 chapterdata.linktype=linktype;
                 data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
-                console.log(data.sections[serieskey].books[volumekey].chapters);
                 //Actually this extra layer can be removed, but then this means that the client must
                 //Understand the type of link baka tsuki uses, which defeats the purpose of abstraction.
               } 
@@ -189,13 +190,24 @@ function seriesTitleFilterByDownload(req,res){
                 var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).text();
                 var chapterdata={};
                 chapterdata.title=titletext;
-                chapterdata.link=$(this).attr('href');
+                chapterdata.link=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
                 var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
                 chapterdata.linktype=linktype;
                 data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
-                console.log(data.sections[serieskey].books[volumekey].chapters);
               }
             });
+
+            //Find the cover image in each volume section
+            var coverimg=walker.find("img");
+            console.log(coverimg.attr('src'));
+            if(coverimg){
+              coverimgsrc=coverimg.attr('src');
+              if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
+                coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+              }
+              data.sections[serieskey].books[volumekey].cover=coverimgsrc;
+              console.log(data.sections[serieskey].books[volumekey].cover);
+            }
             
           }
           //This covers the special case where the series contains direct links to stories instead of volumes.
