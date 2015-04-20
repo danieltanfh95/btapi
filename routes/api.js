@@ -9,7 +9,11 @@ router.get('/',function(req,res){
   //console.log(res);
 })
 
-function seriesTitleFilterByDownload(req,res,data){
+function seriesLanguageFilterByDownload(req,res){
+  //To do:
+}
+
+function seriesTitleFilterByDownload(req,res){
   var postdata=req.query;
 
   // Continue only if series title is available.
@@ -156,7 +160,7 @@ function seriesTitleFilterByDownload(req,res,data){
     });
   }else{
     //Future cache here.
-    res.send("Please show which volume you want.");
+    //res.send("Please show which volume you want.");
   }
 }
 
