@@ -164,21 +164,23 @@ function seriesTitleFilterByDownload(req,res){
         })
         
         //Determine the type of overall image placing
-        var volheading=$(":header:contains('"+data.sections[0].books[0].title+"')").first();
-        var coverimage=volheading.prevUntil($(":header")).find("img");
-        var imageplacing=0;
-        if(coverimage.attr('src')){
-          imageplacing=1;
-        }
-        else{
-          coverimage=volheading.parentsUntil($(":header")).find("img");
-            if(coverimage.attr('src')){
-              imageplacing=2;
-            }else{
-              //Others are in the sections after the heading
-              imageplacing=3;
-            }
-        }
+        if(data.sections[0]){
+          var volheading=$(":header:contains('"+data.sections[0].books[0].title+"')").first();
+          var coverimage=volheading.prevUntil($(":header")).find("img");
+          var imageplacing=0;
+          if(coverimage.attr('src')){
+            imageplacing=1;
+          }
+          else{
+            coverimage=volheading.parentsUntil($(":header")).find("img");
+              if(coverimage.attr('src')){
+                imageplacing=2;
+              }else{
+                //Others are in the sections after the heading
+                imageplacing=3;
+              }
+          }
+        }        
 
         //Search for available chapters and their interwikilinks from the page.
         for(var serieskey in data.sections){
