@@ -267,13 +267,24 @@ function seriesTitleFilterByDownload(req,res){
             }
             //This covers the special case where the series contains direct links to stories instead of volumes.
             //Kino no tabi
-            if( Object.keys(data.sections[serieskey].books).length<1){
-              console.log(serieskey);
-              var walker=$(":header:contains('"+serieskey+"')").nextUntil($(":header"));
+            if( data.sections[serieskey].books.length<1){
+              console.log(data.sections[serieskey].books);
+              var walker=$(":header:contains('"+data.sections[serieskey].title+"')").nextUntil($(":header"));
               var chapterlinks=walker.find("a");
               chapterlinks.each(function(){
-                if(!$(this).attr('href').match(/\.\w+$/g)){
-                  //data.sections[serieskey][$(this).attr('title')]=$(this).attr('href');
+                if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
+                  var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parentsUntil($("p")).text();
+                  var chapterdata={};
+                  chapterdata.title=titletext;
+                  chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
+                  var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
+                  chapterdata.linktype=linktype;
+                  if(linktype=="internal"){
+                    chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
+                  }else{
+                    chapterdata.link=$(this).attr('href');
+                  }
+                  data.sections[serieskey].books.push(chapterdata);
                 }              
               });
             }
