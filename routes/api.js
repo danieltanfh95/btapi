@@ -219,7 +219,7 @@ function seriesTitleFilterByDownload(req,res){
               chapterlinks.each(function(){
                 //Remove red links to pages that does not exist too.              
                 if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
-                  var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parentsUntil($("p")).text();
+                  var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parentsUntil($("span, p")).text();
                   var chapterdata={};
                   chapterdata.title=titletext;
                   chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
@@ -273,7 +273,8 @@ function seriesTitleFilterByDownload(req,res){
               var chapterlinks=walker.find("a");
               chapterlinks.each(function(){
                 if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
-                  var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parentsUntil($("p")).text();
+                  //
+                  var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parentsUntil($("span, p")).text();
                   var chapterdata={};
                   chapterdata.title=titletext;
                   chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
