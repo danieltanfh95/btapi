@@ -139,10 +139,10 @@ function seriesTitleFilterByDownload(req,res){
 
         //Completed Preloading of Data
         //Get data about available volumes from the toc
-        console.log($("ul"));
+        //console.log($("ul"));
         $("#toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
-          if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous/i) && $(this).hasClass("toclevel-1")){         
+          if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full/i) && $(this).hasClass("toclevel-1")){         
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
             var volumesnames=volumelist.slice(1,volumelist.length);
             var seriesname=stripNumbering(volumelist[0]);
@@ -164,119 +164,119 @@ function seriesTitleFilterByDownload(req,res){
           }          
         })
         
-        //Determine the type of overall image placing
-        if(data.sections[0]){
-          var volheading=$(":header:contains('"+data.sections[0].books[0].title+"')").first();
-          var coverimage=volheading.prevUntil($(":header")).find("img");
-          var imageplacing=0;
-          if(coverimage.attr('src')){
-            imageplacing=1;
-          }
-          else{
-            coverimage=volheading.parentsUntil($(":header")).find("img");
-              if(coverimage.attr('src')){
-                imageplacing=2;
-              }else{
-                //Others are in the sections after the heading
-                imageplacing=3;
-              }
-          }
-        }        
+                 
 
         //Search for available chapters and their interwikilinks from the page.
-        for(var serieskey in data.sections){
-          //The special case of Moonlight sculptor will not be covered as it is hosted outside of BT
-          for(var volumekey in data.sections[serieskey].books){
-            //First search for links in the heading.
-            //This includes full text page versions.
-            var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title+"')").first();
-            var headinglinks=heading.find('a');
-            headinglinks.each(function(){
-              //Reject links to edit the page or template and resource links.
-              if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
-                var chapterdata={};
-                chapterdata.title=$(this).attr('title');
-                chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
-                var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
-                chapterdata.linktype=linktype;
-                if(linktype=="internal"){
-                  chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
+        if(data.sections){
+          //Determine the type of overall image placing
+          //console.log(data.sections[0].books);
+          if(data.sections[0].books[0]){
+            var volheading=$(":header:contains('"+data.sections[0].books[0].title+"')").first();
+            var coverimage=volheading.prevUntil($(":header")).find("img");
+            var imageplacing=0;
+            if(coverimage.attr('src')){
+              imageplacing=1;
+            }
+            else{
+              coverimage=volheading.parentsUntil($(":header")).find("img");
+                if(coverimage.attr('src')){
+                  imageplacing=2;
                 }else{
-                  chapterdata.link=$(this).attr('href');
+                  //Others are in the sections after the heading
+                  imageplacing=3;
                 }
-                data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
-                //Actually this extra layer can be removed, but then this means that the client must
-                //Understand the type of link baka tsuki uses, which defeats the purpose of abstraction.
-              } 
-            });
-            //Walk through the following sections for links until the next heading.
-            var walker=heading.nextUntil($(":header"));
-            var chapterlinks=walker.find("a");
-            //console.log(heading.text());
-            chapterlinks.each(function(){
-              //Remove red links to pages that does not exist too.              
-              if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
-                var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).text();
-                var chapterdata={};
-                chapterdata.title=titletext;
-                chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
-                var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
-                chapterdata.linktype=linktype;
-                if(linktype=="internal"){
-                  chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
-                }else{
-                  chapterdata.link=$(this).attr('href');
+            }
+          } 
+          for(var serieskey in data.sections){
+            //The special case of Moonlight sculptor will not be covered as it is hosted outside of BT
+            for(var volumekey in data.sections[serieskey].books){
+              //First search for links in the heading.
+              //This includes full text page versions.
+              var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title+"')").first();
+              var headinglinks=heading.find('a');
+              headinglinks.each(function(){
+                //Reject links to edit the page or template and resource links.
+                if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
+                  var chapterdata={};
+                  chapterdata.title=$(this).text();
+                  chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
+                  var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
+                  chapterdata.linktype=linktype;
+                  if(linktype=="internal"){
+                    chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
+                  }else{
+                    chapterdata.link=$(this).attr('href');
+                  }
+                  data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
+                  //Actually this extra layer can be removed, but then this means that the client must
+                  //Understand the type of link baka tsuki uses, which defeats the purpose of abstraction.
+                } 
+              });
+              //Walk through the following sections for links until the next heading.
+              var walker=heading.nextUntil($(":header"));
+              var chapterlinks=walker.find("a");
+              //console.log(heading.text());
+              chapterlinks.each(function(){
+                //Remove red links to pages that does not exist too.              
+                if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
+                  var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parentsUntil($("p")).text();
+                  var chapterdata={};
+                  chapterdata.title=titletext;
+                  chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
+                  var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
+                  chapterdata.linktype=linktype;
+                  if(linktype=="internal"){
+                    chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
+                  }else{
+                    chapterdata.link=$(this).attr('href');
+                  }
+                  data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
                 }
-                data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
-              }
-            });
+              });
 
-            //Find the cover image in each volume section
-            //Search for images after heading
-            if(imageplacing==3){
-              var coverimg=walker.find("img");
-              if(coverimg){
-                coverimgsrc=coverimg.attr('src');
-                if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
-                  coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+              //Find the cover image in each volume section
+              //Search for images after heading
+              if(imageplacing==3){
+                var coverimg=walker.find("img");
+                if(coverimg){
+                  coverimgsrc=coverimg.attr('src');
+                  if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
+                    coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+                  }
+                  data.sections[serieskey].books[volumekey].cover=coverimgsrc;
                 }
-                data.sections[serieskey].books[volumekey].cover=coverimgsrc;
-              }
-            }else if(imageplacing==2){
-              var coverimg=heading.parentsUntil($(":header")).find("img");
-              if(coverimg){
-                coverimgsrc=coverimg.attr('src');
-                if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
-                  coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+              }else if(imageplacing==2){
+                var coverimg=heading.parentsUntil($(":header")).find("img");
+                if(coverimg){
+                  coverimgsrc=coverimg.attr('src');
+                  if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
+                    coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+                  }
+                  data.sections[serieskey].books[volumekey].cover=coverimgsrc;
                 }
-                data.sections[serieskey].books[volumekey].cover=coverimgsrc;
-              }
-            }else if(imageplacing==1){
-              var coverimg=heading.prevUntil($(":header")).find("img");
-              if(coverimg){
-                coverimgsrc=coverimg.attr('src');
-                if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
-                  coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+              }else if(imageplacing==1){
+                var coverimg=heading.prevUntil($(":header")).find("img");
+                if(coverimg){
+                  coverimgsrc=coverimg.attr('src');
+                  if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
+                    coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+                  }
+                  data.sections[serieskey].books[volumekey].cover=coverimgsrc;
                 }
-                data.sections[serieskey].books[volumekey].cover=coverimgsrc;
               }
             }
-            
-            //Cover special case of images before the heading
-
-            
-          }
-          //This covers the special case where the series contains direct links to stories instead of volumes.
-          //Kino no tabi
-          if( Object.keys(data.sections[serieskey]).length<1){
-            //console.log(serieskey);
-            var walker=$(":header:contains('"+serieskey+"')").nextUntil($(":header"));
-            var chapterlinks=walker.find("a");
-            chapterlinks.each(function(){
-              if(!$(this).attr('href').match(/\.\w+$/g)){
-                data.sections[serieskey][$(this).attr('title')]=$(this).attr('href');
-              }              
-            });
+            //This covers the special case where the series contains direct links to stories instead of volumes.
+            //Kino no tabi
+            if( Object.keys(data.sections[serieskey].books).length<1){
+              console.log(serieskey);
+              var walker=$(":header:contains('"+serieskey+"')").nextUntil($(":header"));
+              var chapterlinks=walker.find("a");
+              chapterlinks.each(function(){
+                if(!$(this).attr('href').match(/\.\w+$/g)){
+                  //data.sections[serieskey][$(this).attr('title')]=$(this).attr('href');
+                }              
+              });
+            }
           }
         }
 
