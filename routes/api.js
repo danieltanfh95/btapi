@@ -106,7 +106,10 @@ function seriesTitleFilterByDownload(req,res){
         data.status=status ? status[0].toLowerCase() : "active";
         data.author="";
         data.synopsis="";
-        data.cover="";
+        data.cover=$(".thumbinner").find("img").attr('src');
+        if (data.cover && data.cover.match(/^\/project/g)){
+          data.cover="http://www.baka-tsuki.org"+data.cover;
+        }
         
         var synopsiswalk = $(":header").filter(function(){
           return $(this).text().match(/synopsis/i)!=null;
