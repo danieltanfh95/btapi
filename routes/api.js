@@ -198,15 +198,19 @@ function seriesTitleFilterByDownload(req,res){
             });
 
             //Find the cover image in each volume section
+            //Note the My_Youth_Romantic_Comedy_Is_Wrong_As_I_Expected special case
+            //Some Lightnovels put the image before the heading
+
+
             var coverimg=walker.find("img");
-            console.log(coverimg.attr('src'));
+            //console.log(coverimg.attr('src'));
             if(coverimg){
               coverimgsrc=coverimg.attr('src');
               if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
                 coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
               }
               data.sections[serieskey].books[volumekey].cover=coverimgsrc;
-              console.log(data.sections[serieskey].books[volumekey].cover);
+              //console.log(data.sections[serieskey].books[volumekey].cover);
             }
             
           }
@@ -230,38 +234,44 @@ function seriesTitleFilterByDownload(req,res){
 
         // filter by series
         if(postdata.series){
+          var tempseries=[];
           for(var serieskey in data.sections){
             //Case insensitive search
-            //No url sanitisation so users can use regex search
+            //No url sanitisation so users can use regex search            
             var re = new RegExp(postdata.series, 'i');
-            if(!serieskey.match(re)){
-              delete data.sections[serieskey];
+            if(data.sections[serieskey].title.match(re)){
+              tempseries.push(data.sections[serieskey]);
             }
           }
+          data.sections=tempseries;
         }
 
         //filter by volume
         if(postdata.volume){
           for(var serieskey in data.sections){
-            for(var volumekey in data.sections[serieskey]){
+            var tempvol=[];
+            for(var volumekey in data.sections[serieskey].books){
               var re = new RegExp(postdata.volume, 'i');
-              if(!volumekey.match(re)){
-                delete data.sections[serieskey][volumekey];
+              if(data.sections[serieskey].books[volumekey].title.match(re)){
+                tempvol.push(data.sections[serieskey].books[volumekey]);
               }
             }
+            data.sections[serieskey].books=tempvol;
           }
         }
 
         //convenience filter: By volume number
-        if(postdata.volumeno){
+        if(postdata.volumeno){          
           for(var serieskey in data.sections){
-            for(var volumekey in data.sections[serieskey]){
+            var tempvol=[];
+            for(var volumekey in data.sections[serieskey].books){
               //Non number input will be removed
               var re = new RegExp("volume ?"+postdata.volumeno.match(/\d+/g)+" ", 'i');
-              if(!volumekey.match(re)){
-                delete data.sections[serieskey][volumekey];
+              if(data.sections[serieskey].books[volumekey].title.match(re)){
+                tempvol.push(data.sections[serieskey].books[volumekey]);
               }
             }
+            data.sections[serieskey].books=tempvol;
           }
         }
         res.send(data); 
