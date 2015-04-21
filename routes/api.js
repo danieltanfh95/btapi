@@ -159,6 +159,24 @@ function seriesTitleFilterByDownload(req,res){
             data.sections.push(seriesdata);
           }          
         })
+        
+        //Determine the type of overall image placing
+        var volheading=$(":header:contains('"+data.sections[0].books[0].title+"')").first();
+        var coverimage=volheading.prevUntil($(":header")).find("img");
+        var imageplacing=0;
+        if(coverimage.attr('src')){
+          imageplacing=1;
+        }
+        else{
+          coverimage=volheading.parentsUntil($(":header")).find("img");
+            if(coverimage.attr('src')){
+              imageplacing=2;
+            }else{
+              //Others are in the sections after the heading
+              imageplacing=3;
+            }
+        }
+
         //Search for available chapters and their interwikilinks from the page.
         for(var serieskey in data.sections){
           //The special case of Moonlight sculptor will not be covered as it is hosted outside of BT
@@ -198,20 +216,38 @@ function seriesTitleFilterByDownload(req,res){
             });
 
             //Find the cover image in each volume section
-            //Note the My_Youth_Romantic_Comedy_Is_Wrong_As_I_Expected special case
-            //Some Lightnovels put the image before the heading
-
-
-            var coverimg=walker.find("img");
-            //console.log(coverimg.attr('src'));
-            if(coverimg){
-              coverimgsrc=coverimg.attr('src');
-              if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
-                coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+            //Search for images after heading
+            if(imageplacing==3){
+              var coverimg=walker.find("img");
+              if(coverimg){
+                coverimgsrc=coverimg.attr('src');
+                if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
+                  coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+                }
+                data.sections[serieskey].books[volumekey].cover=coverimgsrc;
               }
-              data.sections[serieskey].books[volumekey].cover=coverimgsrc;
-              //console.log(data.sections[serieskey].books[volumekey].cover);
+            }else if(imageplacing==2){
+              var coverimg=heading.parentsUntil($(":header")).find("img");
+              if(coverimg){
+                coverimgsrc=coverimg.attr('src');
+                if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
+                  coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+                }
+                data.sections[serieskey].books[volumekey].cover=coverimgsrc;
+              }
+            }else if(imageplacing==1){
+              var coverimg=heading.prevUntil($(":header")).find("img");
+              if(coverimg){
+                coverimgsrc=coverimg.attr('src');
+                if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
+                  coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+                }
+                data.sections[serieskey].books[volumekey].cover=coverimgsrc;
+              }
             }
+            
+            //Cover special case of images before the heading
+
             
           }
           //This covers the special case where the series contains direct links to stories instead of volumes.
@@ -227,6 +263,8 @@ function seriesTitleFilterByDownload(req,res){
             });
           }
         }
+
+
         // Filtering mechanism
         // While this may be wasteful since we don't filter while we insert the data,
         // However, this provides future oppurtunity to cache results instead of parsing it everytime.
