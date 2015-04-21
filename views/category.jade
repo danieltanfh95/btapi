@@ -1,0 +1,173 @@
+extends layout
+
+block content
+  h3 Type and Language Search
+  h5 route: "/api/category"
+  h5 return: JSON
+  h5 format: /api/category?[type={type_of_title}][language={type_of_language}]
+  br
+  h4 
+    u Filter Parameters
+
+  h5 By type (Optional)
+  a(href="/api/category?type=LIGHT_NOVEL")
+    /api/category?type=LIGHT_NOVEL
+  p 
+    | Either parameter may be present. Current available types includes: 
+    b LIGHT_NOVEL, TEASER, ORINGINAL_NOVEL. 
+    | It is 
+    b case insensitive.
+
+
+  h5 By language (Optional)
+  a(href="/api/category?type=ENGLISH")
+    /api/category?language=ENGLISH
+  p 
+    | Either parameter may be present. Language must be given in it's english name.
+    b english name. 
+    | It is 
+    b case insensitive.
+
+  br
+
+  h4 
+    u JSON properties
+  p There are different responses for different parameter combinations.
+  h5 Type
+  p (JSON) Shows the language available for that particular type.
+  ul 
+    li 
+      h5 type
+      p 
+        | (STRING) type of title, e.g. 
+        b Light_novel, teaser, Original_novel.
+    li 
+      h5 language
+      p  
+        | (LIST) languages available for that type. 
+
+  br
+  h5 Example JSON 
+  a(href="/api/category?type=LIGHT_NOVEL")
+    code /api/category?type=LIGHT_NOVEL
+  br
+  .form-group
+    textarea.form-control(rows="33", disabled).
+      {
+        "types": "Light_novel",
+        "language": [
+          "Arabic",
+          "Brazilian Portuguese",
+          "Bulgarian",
+          "Croatian",
+          "Czech",
+          "Dutch",
+          "English",
+          "Esperanto",
+          "Filipino",
+          "French",
+          "German",
+          "Greek",
+          "Hungarian",
+          "Indonesian",
+          "Italian",
+          "Korean",
+          "Lithuanian",
+          "Macedonian",
+          "Myanmar",
+          "Norwegian",
+          "Polish",
+          "Romanian",
+          "Russian",
+          "Spanish",
+          "Swedish",
+          "Turkish",
+          "Vietnamese"
+        ]
+      }
+  br
+  h5 Language
+  p (JSON) Shows the types available for that particular language.
+  ul 
+    li 
+      h5 language
+      p 
+        | (STRING) Language being queried 
+    li 
+      h5 language
+      p  
+        | (LIST) types available for that language. 
+
+  br
+  h5 Example JSON 
+  a(href="/api/category?language=ENGLISH")
+    code /api/category?language=ENGLISH
+  br
+  .form-group
+    textarea.form-control(rows="7", disabled).
+      {
+        "language": "English",
+        "types": [
+          "Light_novel",
+          "Teaser"
+        ]
+      }
+  br
+  h5 Type&Language
+  p (JSON) Shows the titles available that is of type and language
+  ul 
+    li 
+      h5 type
+      p 
+        | (STRING) type of the titles
+    li 
+      h5 language
+      p  
+        | (LIST) language of the titles
+    li 
+      h5 titles
+      p 
+        | (LIST) JSON data of the titles
+        ul
+          li 
+            h5 title
+            p (STRING) title name of the book
+          li 
+            h5 page
+            p (STRING) interwiki main page title of the book.
+          li 
+            h5 lastreviseddate
+            p (STRING) The data and time of the last revision, in the server.
+          li 
+            h5 lastrevisedid
+            p (STRING) the unique id of the last revison.
+          li 
+            h5 pageid
+            p (STRING) the unique id of the main page of the book
+  br
+  h5 Example JSON 
+  a(href="/api/category?type=LIGHT_NOVEL&language=ARABIC")
+    code /api/category?type=LIGHT_NOVEL&language=ARABIC
+  br
+  .form-group
+    textarea.form-control(rows="21", disabled).
+      {
+        "type": "Light_novel",
+        "language": "Arabic",
+        "titles": [
+          {
+            "page": "Suzumiya_haruhi_arabic-\u0633\u0648\u0632\u0648\u0645\u064a\u0627_\u0647\u0627\u0631\u0648\u0647\u064a",
+            "title": "Suzumiya haruhi arabic-\u0633\u0648\u0632\u0648\u0645\u064a\u0627 \u0647\u0627\u0631\u0648\u0647\u064a",
+            "lastreviseddate": "2014-08-14T15:56:18Z",
+            "lastrevisedid": 381727,
+            "pageid": 33699
+          },
+          {
+            "page": "Sword_Art_Online_Arabic_Version",
+            "title": "Sword Art Online Arabic Version",
+            "lastreviseddate": "2014-08-05T07:56:44Z",
+            "lastrevisedid": 378229,
+            "pageid": 40186
+          }
+        ]
+      }

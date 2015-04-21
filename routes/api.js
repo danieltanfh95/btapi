@@ -18,18 +18,23 @@ function seriesLanguageFilterByDownload(req,res){
     var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     var category =titletype+"_("+language+")";
-    download("http://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:"+category, function(resd){
+    download("http://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&generator=categorymembers&gcmlimit=500&gcmtype=page&format=json&gcmtitle=Category:"+category, function(resd){
       var data={};
       var jsondata=JSON.parse(resd);
-      var serieslist=jsondata.query.categorymembers;
+      var serieslist=jsondata.query.pages;
       data.type=titletype;
       data.language=language;
       data.titles=[];
+      console.log(serieslist.length);
       for(var key in serieslist){
         var title=serieslist[key].title;
-        data.titles[key]={};
-        data.titles[key].page=title.replace(/ /g,"_");
-        data.titles[key].title=title;
+        var titledata={}
+        titledata.page=title.replace(/ /g,"_");
+        titledata.title=title;
+        titledata.lastreviseddate=serieslist[key].touched;
+        titledata.lastrevisedid=serieslist[key].lastrevid;
+        titledata.pageid=serieslist[key].pageid;
+        data.titles.push(titledata);
       }
       res.send(data);
     })    

@@ -1,7 +1,13 @@
 extends layout
 
 block content
-  h4 Series Search - Filter Parameters
+  h3 Light Novel Search
+  h5 route: "/api/"
+  h5 return: JSON
+  h5 format: /api?title={light_novel_title}[&series={regex_of_series_name}][&volume={regex_of_volume_name}][&volumeno={volume_number}]
+  br
+  h4 
+    u Filter Parameters
 
   h5 By title
   a(href="/api?title=Zero_no_Tsukaima")
@@ -11,7 +17,7 @@ block content
     b must be present 
     | to continue.
 
-  h5 By series 
+  h5 By series (Optional)
   a(href="/api?title=Chrome_Shelled_Regios&series=chrome|regios")
     /api?title=Chrome_Shelled_Regios&series=chrome|regios 
   p 
@@ -19,7 +25,7 @@ block content
     b regex 
     | of the series name. The example above uses the pipe character.
 
-  h5 By volume
+  h5 By volume (Optional)
   a(href="/api?title=Chrome_Shelled_Regios&series=chrome&volume=15|log")
     /api?title=Chrome_Shelled_Regios&series=chrome&volume=15|log 
   p 
@@ -27,7 +33,7 @@ block content
     b regex 
     | of the volume name, which includes the volume number. The example above uses the pipe character.
 
-  h5 By volume number
+  h5 By volume number (Optional)
   a(href="/api?title=Chrome_Shelled_Regios&series=chrome&volumeno=1")
     /api?title=Chrome_Shelled_Regios&series=chrome&volumeno=1 
   p 
@@ -38,7 +44,8 @@ block content
 
   br
 
-  h4 Series Search - JSON properties
+  h4 
+    u JSON properties
 
   h5 title
   p (STRING) The title of the light novel
@@ -60,10 +67,136 @@ block content
 
   h5 sections
   p 
-    | (JSON) The light novel series available. The data is provided as 
-    b nested JSON. 
-    | Each series contains a list of volumes and each volume contains a list of chapters. 
+    | (LIST) The light novel series available. The data is provided as 
+    b nested lists  
+    | which contain json to preserve the order. Each series contains a 
+    | list of volumes and each volume contains a list of chapters. 
   p 
     | Each chapter contains the 
     b wiki link 
     | to the page.
+
+  ul 
+    li 
+      h5 title 
+      p (STRING) title of the series
+    li 
+      h5 books
+      p (LIST) volumes available for the series
+      ul
+        li
+          h5 title
+          p (STRING) title of the volume 
+          h5 cover
+          p (LINK) absolute link to the cover image of the volume
+          h5 chapters
+          p (LIST) chapters available for the volume, including external links
+          ul 
+            li
+              h5 title
+              p (STRING) title of the chapter
+              h5 page
+              p (STRING) title of the page of the chapter in the wiki or link of external page.
+              h5 linktype
+              p (STRING) type of link of the chapter page. Two options are available: internal and external
+              h5 link
+              p (LINK) absolute link to the chapter
+
+
+  h5 cover
+  p (LINK) absolute link to the cover image of the novel
+
+  br
+  h4 Example JSON 
+  a(href="/api?title=Hyouka&volumeno=1")
+    code /api?title=Hyouka&volumeno=1
+  br
+  .form-group
+    textarea.form-control(rows="95", disabled).
+      {
+        "title": "Hyouka",
+        "sections": [
+          {
+            "title": "The Hyouka (Classics Club) series \uff08\u3008\u53e4\u5178\u90e8\u3009\u30b7\u30ea\u30fc\u30ba\uff09 by Honobu Yonezawa",
+            "books": [
+              {
+                "title": "Volume 1 - Hyouka \u6c37\u83d3 - You can't escape \/ The niece of time (Full Text - PDF)",
+                "chapters": [
+                  {
+                    "title": "Full Text",
+                    "page": "Hyouka:Volume_1",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Chapter 1",
+                    "page": "Hyouka:Volume_1_Chapter_1",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Chapter_1"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Chapter 2",
+                    "page": "Hyouka:Volume_1_Chapter_2",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Chapter_2"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Chapter 3",
+                    "page": "Hyouka:Volume_1_Chapter_3",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Chapter_3"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Chapter 4",
+                    "page": "Hyouka:Volume_1_Chapter_4",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Chapter_4"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Chapter 5",
+                    "page": "Hyouka:Volume_1_Chapter_5",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Chapter_5"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Chapter 6",
+                    "page": "Hyouka:Volume_1_Chapter_6",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Chapter_6"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Chapter 7",
+                    "page": "Hyouka:Volume_1_Chapter_7",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Chapter_7"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Chapter 8",
+                    "page": "Hyouka:Volume_1_Chapter_8",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Chapter_8"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Chapter 9",
+                    "page": "Hyouka:Volume_1_Chapter_9",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Chapter_9"
+                  },
+                  {
+                    "title": "Hyouka:Volume 1 Afterword",
+                    "page": "Hyouka:Volume_1_Afterword",
+                    "linktype": "internal",
+                    "link": "http:\/\/www.baka-tsuki.org\/project\/index.php?title=Hyouka:Volume_1_Afterword"
+                  }
+                ],
+                "cover": "http:\/\/www.baka-tsuki.org\/project\/images\/thumb\/8\/87\/Hyouka_01.jpg\/161px-Hyouka_01.jpg"
+              }
+            ]
+          }
+        ],
+        "status": "active",
+        "author": "Honobu Yonezawa",
+        "synopsis": "Oreki Houtarou is a self-proclaimed \"energy-saver\"(reserved battery mode)  - that is, he will not actively waste energy doing things that aren't necessary. Though he had no interest whatsoever in joining any clubs upon entering Kamiyama High School, he was commanded by his older sister Tomoka to enter the school's Classics Club, which was in danger of getting abolished as all previous members have graduated. Together with his old friends Fukube Satoshi and Ibara Mayaka, as well as the elegantly ladylike and curiously inquisitive Chitanda Eru, the newly reformed Classics Club find themselves involved in all sorts of mystery-solving escapades. Houtarou soon finds out that the Classics Club, as Tomoka has promised, is actually \"quite interesting\".\nAnd so begins the \"Classics Club Series\".\nAdapted into an anime series by Kyoto Animation in 2012 under the title \"Hyouka\".\n",
+        "cover": "http:\/\/www.baka-tsuki.org\/project\/images\/thumb\/6\/6c\/Hyouka_v01_000.jpg\/180px-Hyouka_v01_000.jpg"
+      }
+

@@ -9,4 +9,8 @@ router.get('/', function(req, res) {
 router.get('/series', function(req, res) {
   res.render('series', { title: 'Express'});
 });
+
+router.get('/category', function(req, res) {
+  res.render('category', { title: 'Express'});
+});
 module.exports = router;
