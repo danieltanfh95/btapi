@@ -139,8 +139,9 @@ function seriesTitleFilterByDownload(req,res){
 
         //Completed Preloading of Data
         //Get data about available volumes from the toc
-        console.log($(".toc ul li, #toc ul li").text());
-        $(".toc ul li").each(function(){          
+        console.log($("#toc ul li"));
+        console.log($("#toc ul li").text());
+        $("#toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
           console.log($(this).text());
           if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous/i) && $(this).hasClass("toclevel-1")){         
