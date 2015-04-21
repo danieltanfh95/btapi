@@ -193,9 +193,14 @@ function seriesTitleFilterByDownload(req,res){
               if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
                 var chapterdata={};
                 chapterdata.title=$(this).attr('title');
-                chapterdata.link=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
+                chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
                 var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
                 chapterdata.linktype=linktype;
+                if(linktype=="internal"){
+                  chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
+                }else{
+                  chapterdata.link=$(this).attr('href');
+                }
                 data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
                 //Actually this extra layer can be removed, but then this means that the client must
                 //Understand the type of link baka tsuki uses, which defeats the purpose of abstraction.
@@ -211,9 +216,14 @@ function seriesTitleFilterByDownload(req,res){
                 var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).text();
                 var chapterdata={};
                 chapterdata.title=titletext;
-                chapterdata.link=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
+                chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
                 var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
                 chapterdata.linktype=linktype;
+                if(linktype=="internal"){
+                  chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
+                }else{
+                  chapterdata.link=$(this).attr('href');
+                }
                 data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
               }
             });
