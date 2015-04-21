@@ -5,11 +5,22 @@ var router = express.Router();
 
 /* New parsing method */
 router.get('/',function(req,res){
-  seriesTitleFilterByDownload(req,res);
+  var postdata=req.query;
+  if(Object.keys(postdata).length<1){
+    res.redirect('../');
+  }else{
+    seriesTitleFilterByDownload(req,res);
+  }  
   //console.log(res);
 })
 router.get('/category',function(req,res){
-  seriesLanguageFilterByDownload(req,res);
+  var postdata=req.query;
+  if(Object.keys(postdata).length<1){
+    res.redirect('../');
+  }else{
+    seriesLanguageFilterByDownload(req,res);
+  }  
+  
 })
 
 function seriesLanguageFilterByDownload(req,res){
