@@ -139,8 +139,8 @@ function seriesTitleFilterByDownload(req,res){
 
         //Completed Preloading of Data
         //Get data about available volumes from the toc
-        console.log($("#toc ul li"));
-        console.log($("#toc ul li").text());
+        console.log($("#toc"));
+        console.log($("#toc").text());
         $("#toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
           console.log($(this).text());
