@@ -268,7 +268,7 @@ function seriesTitleFilterByDownload(req,res){
             //This covers the special case where the series contains direct links to stories instead of volumes.
             //Kino no tabi
             if( data.sections[serieskey].books.length<1){
-              console.log(data.sections[serieskey].books);
+              //console.log(data.sections[serieskey].books);
               var walker=$(":header:contains('"+data.sections[serieskey].title+"')").nextUntil($(":header"));
               var chapterlinks=walker.find("a");
               chapterlinks.each(function(){
@@ -332,7 +332,7 @@ function seriesTitleFilterByDownload(req,res){
             var tempvol=[];
             for(var volumekey in data.sections[serieskey].books){
               //Non number input will be removed
-              var re = new RegExp("volume ?"+postdata.volumeno.match(/\d+/g)+" ", 'i');
+              var re = new RegExp("volume.?"+postdata.volumeno.match(/\d+/g), 'i');
               if(data.sections[serieskey].books[volumekey].title.match(re)){
                 tempvol.push(data.sections[serieskey].books[volumekey]);
               }
