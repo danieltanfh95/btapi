@@ -7,7 +7,7 @@ var router = express.Router();
 router.get('/',function(req,res){
   var postdata=req.query;
   if(Object.keys(postdata).length<1){
-    res.redirect('../');
+    res.redirect('/series');
   }else{
     seriesTitleFilterByDownload(req,res);
   }  
@@ -16,12 +16,59 @@ router.get('/',function(req,res){
 router.get('/category',function(req,res){
   var postdata=req.query;
   if(Object.keys(postdata).length<1){
-    res.redirect('../');
+    res.redirect('/category');
   }else{
     seriesLanguageFilterByDownload(req,res);
   }  
   
 })
+
+router.get('/time',function(req,res){
+  var postdata=req.query;
+  if(Object.keys(postdata).length<1){
+    res.redirect('/time');
+  }else{
+    lastUpdatesTimeByDownload(req,res);
+  }  
+  
+})
+
+function lastUpdatesTimeByDownload(req,res){
+  var postdata=req.query; 
+  if(postdata.titles||postdata.pageids){
+    download("http://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&format=json&titles="+postdata.titles, function(resd){
+      var titledata=JSON.parse(resd);
+      download("http://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&format=json&pageids="+postdata.pageids, function(resd){
+        var pagedata=JSON.parse(resd);
+        var data=[];
+        if(titledata.query.normalized.from!="undefined"){
+          console.log(titledata.query);
+          var pages=titledata.query.pages;
+          for(var title in pages){
+            var obj={};
+            obj.title=pages[title].title;
+            obj.pageid=pages[title].pageid;
+            obj.lastrevisedid=pages[title].lastrevid;
+            obj.lastreviseddate=pages[title].revisions[0].timestamp
+            data.push(obj);
+          }
+        }
+        if(!pagedata.query.pages[0]){
+          var pages=pagedata.query.pages;
+          for(var title in pages){
+            var obj={};
+            obj.title=pages[title].title;
+            obj.pageid=pages[title].pageid;
+            obj.lastrevisedid=pages[title].lastrevid;
+            obj.lastreviseddate=pages[title].revisions[0].timestamp;
+            data.push(obj);
+          }
+        }
+        res.send(data);
+      });
+    });
+  }
+}
 
 function seriesLanguageFilterByDownload(req,res){
   var postdata=req.query;
@@ -42,7 +89,7 @@ function seriesLanguageFilterByDownload(req,res){
         var titledata={}
         titledata.page=title.replace(/ /g,"_");
         titledata.title=title;
-        titledata.lastreviseddate=serieslist[key].touched;
+        titledata.lastreviseddate=serieslist[key].revisions[0].timestamp;
         titledata.lastrevisedid=serieslist[key].lastrevid;
         titledata.pageid=serieslist[key].pageid;
         data.titles.push(titledata);
