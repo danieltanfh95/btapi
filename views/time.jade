@@ -1,0 +1,66 @@
+extends layout
+
+block content
+  h3 Time and Revision Search
+  h5 route: "/api/time"
+  h5 return: JSON
+  h5 format: /api/time?[titles={titles1|titles2|...}][pageids={pageid1|pageid2|...}]
+  br
+  h4 
+    u Filter Parameters
+  h5 By titles (Optional)
+  a(href="/api/time?titles=Zero_no_Tsukaima|Kino_no_Tabi")
+    /api/category?type=LIGHT_NOVEL
+  p 
+    | Either parameter may be present. Multiple values must be separated by a 
+    b pipe character ("|"). 
+    | The values must be a valid interwiki page link.
+
+
+  h5 By pageids (Optional)
+  a(href="/api/time?pageids=1912")
+    /api/category?language=ENGLISH
+  p 
+    | Either parameter may be present. Multiple values must be separated by a 
+    b pipe character ("|"). 
+    | The values must be a valid wiki pageid.
+
+  br
+  h4 
+    u JSON properties
+  p A list of JSON is returned as to preserve the order. Titles queries go before page queries.
+  h5 title
+  p (STRING) The title of the page.
+  h5 pageid
+  p (NUMBER) The pageid of the page.
+  h5 lastrevisedid
+  p (NUMBER) The unique id of the last revision of the page.
+  h5 lastreviseddate
+  p (STRING) The date and time of the last revision of the page.
+  br
+  h5 Example JSON 
+  a(href="/api/time?titles=Zero_no_Tsukaima|Kino_no_Tabi&pageids=1912")
+    code /api/time?titles=Zero_no_Tsukaima|Kino_no_Tabi&pageids=1912
+  br
+  .form-group
+    textarea.form-control(rows="21", disabled).
+      [
+        {
+          "title": "Zero no Tsukaima",
+          "pageid": 1838,
+          "lastrevisedid": 386470,
+          "lastreviseddate": "2014-08-29T00:58:29Z"
+        },
+        {
+          "title": "Kino no Tabi",
+          "pageid": 4287,
+          "lastrevisedid": 437825,
+          "lastreviseddate": "2015-04-18T05:38:53Z"
+        },
+        {
+          "title": "Zero no Tsukaima:Volume1 Insert and Back Cover",
+          "pageid": 1912,
+          "lastrevisedid": 218491,
+          "lastreviseddate": "2013-01-08T21:29:25Z"
+        }
+      ]
