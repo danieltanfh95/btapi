@@ -142,7 +142,6 @@ function seriesTitleFilterByDownload(req,res){
         console.log($("ul"));
         $("#toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
-          console.log($(this).text());
           if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous/i) && $(this).hasClass("toclevel-1")){         
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
             var volumesnames=volumelist.slice(1,volumelist.length);
