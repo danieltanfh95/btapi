@@ -41,7 +41,7 @@ function lastUpdatesTimeByDownload(req,res){
       download("http://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&format=json&pageids="+postdata.pageids, function(resd){
         var pagedata=JSON.parse(resd);
         var data=[];
-        if(titledata.query.normalized.from!="undefined"){
+        if(titledata.query.normalized[0].from!="undefined"){
           console.log(titledata.query);
           var pages=titledata.query.pages;
           for(var title in pages){
@@ -231,14 +231,14 @@ function seriesTitleFilterByDownload(req,res){
 
         //Sometimes the data for authors is hidden in the first paragraph instead
         if(!data.author){
-          //Search for author name between "by" and a non-character
+          //Search for author name between "by" and a non-character or the word "and"
           authorname=$("p").text().match(/\sby\s(.+)\./i)[1]
                          .split(/and/)[0].replace(/^\s+|\s+$/g, '');
           data.author=authorname;
         }        
                  
 
-        //Search for available chapters and their interwikilinks from the page.
+        
         if(data.sections){
           //Determine the type of overall image placing
           //console.log(data.sections[0].books);
@@ -247,20 +247,22 @@ function seriesTitleFilterByDownload(req,res){
             var coverimage=volheading.prevUntil($(":header")).find("img");
             var imageplacing=0;
             if(coverimage.attr('src')){
+              //Image before the heading
               imageplacing=1;
             }
             else{
               coverimage=volheading.parentsUntil($(":header")).find("img");
                 if(coverimage.attr('src')){
+                  //Image in tables before the heading
                   imageplacing=2;
                 }else{
-                  //Others are in the sections after the heading
+                  //Image in the sections after the heading
                   imageplacing=3;
                 }
             }
           } 
+          //Search for available chapters and their interwikilinks from the page.
           for(var serieskey in data.sections){
-            //The special case of Moonlight sculptor will not be covered as it is hosted outside of BT
             for(var volumekey in data.sections[serieskey].books){
               //First search for links in the heading.
               //This includes full text page versions.
@@ -280,8 +282,6 @@ function seriesTitleFilterByDownload(req,res){
                     chapterdata.link=$(this).attr('href');
                   }
                   data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
-                  //Actually this extra layer can be removed, but then this means that the client must
-                  //Understand the type of link baka tsuki uses, which defeats the purpose of abstraction.
                 } 
               });
               //Walk through the following sections for links until the next heading.
@@ -307,7 +307,6 @@ function seriesTitleFilterByDownload(req,res){
               });
 
               //Find the cover image in each volume section
-              //Search for images after heading
               if(imageplacing==3){
                 var coverimg=walker.find("img");
                 if(coverimg){
