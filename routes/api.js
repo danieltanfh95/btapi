@@ -206,6 +206,8 @@ function seriesTitleFilterByDownload(req,res){
         $("#toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
           if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full/i) && $(this).hasClass("toclevel-1")){         
+            //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
+            console.log($(this).text())
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
             var volumesnames=volumelist.slice(1,volumelist.length);
             var seriesname=stripNumbering(volumelist[0]);
@@ -226,7 +228,14 @@ function seriesTitleFilterByDownload(req,res){
             data.sections.push(seriesdata);
           }          
         })
-        
+
+        //Sometimes the data for authors is hidden in the first paragraph instead
+        if(!data.author){
+          //Search for author name between "by" and a non-character
+          authorname=$("p").text().match(/\sby\s(.+)\./i)[1]
+                         .split(/and/)[0].replace(/^\s+|\s+$/g, '');
+          data.author=authorname;
+        }        
                  
 
         //Search for available chapters and their interwikilinks from the page.
@@ -331,7 +340,6 @@ function seriesTitleFilterByDownload(req,res){
             //This covers the special case where the series contains direct links to stories instead of volumes.
             //Kino no tabi
             if( data.sections[serieskey].books.length<1){
-              //console.log(data.sections[serieskey].books);
               var walker=$(":header:contains('"+data.sections[serieskey].title+"')").nextUntil($(":header"));
               var chapterlinks=walker.find("a");
               chapterlinks.each(function(){
