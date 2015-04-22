@@ -1,3 +1,7 @@
+require('nodetime').profile({
+    accountKey: '396d2e77cae2f8dbd0db7e924e10e0bce925bed5', 
+    appName: 'Node.js Application'
+});
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
