@@ -161,7 +161,7 @@ function seriesTitleFilterByDownload(req,res){
 
       if(jsondata.parse && jsondata.parse.text){
         var $=cheerio.load(jsondata.parse.text["*"]);
-
+        //console.log($(".toc").text());
         //Preload the data for the light novel
         data.title=jsondata.parse.title;
         data.sections=[];
@@ -207,7 +207,7 @@ function seriesTitleFilterByDownload(req,res){
           //Notes that each page format has its own quirks and the program attempts to match all of them
           if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full/i) && $(this).hasClass("toclevel-1")){         
             //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
-            console.log($(this).text())
+            //console.log($(this).text())
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
             var volumesnames=volumelist.slice(1,volumelist.length);
             var seriesname=stripNumbering(volumelist[0]);
