@@ -72,7 +72,7 @@ function lastUpdatesTimeByDownload(req,res){
     //Mediawiki limits the output to 500 so there might a few calls before you get all the data you need.
     var continuekey="";
     var data=[];
-    var maxmatches=100;
+    var maxmatches=200;
     function getLatestRevision() {
       var url="http://www.baka-tsuki.org/project/api.php?action=query&list=recentchanges&format=json&rclimit="+maxmatches;
       if(continuekey){
@@ -106,7 +106,7 @@ function lastUpdatesTimeByDownload(req,res){
             }
           }
         }
-        console.log("download end", data.length, edits.length);
+        //console.log("download end", data.length, edits.length);
         if(edits.length<maxmatches || data.length>=postdata.updates){          
           res.send(data);
         }else{
