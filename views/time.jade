@@ -64,3 +64,76 @@ block content
           "lastreviseddate": "2013-01-08T21:29:25Z"
         }
       ]
+
+  h3 Latest Update Search
+  h5 route: "/api/time"
+  h5 return: JSON
+  h5 format: /api/time?updates={number_of_newest_pages}[&from={starting_datetime}][&until={ending_datetime}]
+  br
+  h4 
+    u Filter Parameters
+  h5 By number of updates
+  a(href="/api/time?updates=20")
+    /api/time?updates=20
+  p 
+    | This must be a number. Extra characters are removed.
+
+  h5 By starting date and time (Optional)
+  a(href="/api/time?updates=20&from=2015-04-22T14:57:31Z")
+    /api/time?updates=20&from=2015-04-22T14:57:31Z
+  p 
+    | The date and time must be in the form of UTC+0, YYYY-MM-DDTHH:MM:SSZ
+
+  h5 By ending date and time (Optional)
+  a(href="/api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z")
+    /api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z
+  p 
+    | This must be used with the 
+    b from 
+    | parameter. If not, it will be ignored. The date and time must be in the form of UTC+0, YYYY-MM-DDTHH:MM:SSZ
+
+  br
+  h4 
+    u JSON properties
+  p A list of JSON is returned as to preserve the order. 
+  h5 title
+  p (STRING) The title of the page.
+  h5 pageid
+  p (NUMBER) The pageid of the page.
+  h5 revid
+  p (NUMBER) The id of the page that is created.
+  h5 timestamp
+  p (STRING) The date and time of the creation of the page.
+  br
+  h5 Example JSON 
+  a(href="/api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z")
+    code /api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z
+  br
+  .form-group
+    textarea.form-control(rows="31", disabled).
+      [
+        {
+          "title": "Toaru Majutsu no Index ~ Bahasa Indonesia:Jilid NT 11",
+          "pageid": 74069,
+          "timestamp": "2015-04-22T20:58:55Z",
+          "revid": 438952
+        },
+        {
+          "title": "Konjiki no Wordmaster:Web Chapter Extra",
+          "pageid": 74065,
+          "timestamp": "2015-04-22T17:09:38Z",
+          "revid": 438905
+        },
+        {
+          "title": "Seiken Tsukai No World Break:Volume 1 Chapter 5",
+          "pageid": 74063,
+          "timestamp": "2015-04-22T15:05:14Z",
+          "revid": 438872
+        },
+        {
+          "title": "MaruMA:DramaCD55:Track16",
+          "pageid": 74062,
+          "timestamp": "2015-04-22T14:57:31Z",
+          "revid": 438870
+        }
+      ]

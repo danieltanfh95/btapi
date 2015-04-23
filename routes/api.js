@@ -68,6 +68,7 @@ function lastUpdatesTimeByDownload(req,res){
       });
     });
   }else if(postdata.updates){
+    postdata.updates=postdata.updates.match(/\d/g).join("");
     //returns the latest newest pages up to a certain number
     //Mediawiki limits the output to 500 so there might a few calls before you get all the data you need.
     var continuekey="";
