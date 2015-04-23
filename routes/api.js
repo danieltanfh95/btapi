@@ -232,10 +232,21 @@ function seriesTitleFilterByDownload(req,res){
         //Sometimes the data for authors is hidden in the first paragraph instead
         if(!data.author){
           //Search for author name between "by" and a non-character or the word "and"
-          authorname=$("p").text().match(/\sby\s(.+)\./i)[1]
-                         .split(/and/)[0].replace(/^\s+|\s+$/g, '');
+          var works=$("p").text().match(/\sby\s(.+)\./i)[1].split(/and|with/);
+          var authorname=works[0].replace(/^\s+|\s+$/g, '');
           data.author=authorname;
-        }        
+        }
+        if(!data.illustrator){
+          var works=$("p").text().match(/\sby\s(.+\.)/i)[1].split(/and|with/);
+          if(works[1]){
+            var illustrator=works[1].match(/\sby\s(.+)\./i);  
+            if(illustrator && illustrator[1]){
+              data.illustrator=illustrator[1];
+            }else{
+              data.illustrator="";
+            }
+          }
+        }
                  
 
         
@@ -270,7 +281,7 @@ function seriesTitleFilterByDownload(req,res){
               var headinglinks=heading.find('a');
               headinglinks.each(function(){
                 //Reject links to edit the page or template and resource links.
-                if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
+                if($(this).attr('title') && !$(this).attr('href').match(/edit|\=Template|\.\w{0,4}$/g)){
                   var chapterdata={};
                   chapterdata.title=$(this).text();
                   chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
@@ -290,7 +301,7 @@ function seriesTitleFilterByDownload(req,res){
               //console.log(heading.text());
               chapterlinks.each(function(){
                 //Remove red links to pages that does not exist too.              
-                if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
+                if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,4}$/g)){
                   var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parent().first().text();
                   var chapterdata={};
                   chapterdata.title=titletext;
@@ -342,7 +353,7 @@ function seriesTitleFilterByDownload(req,res){
               var walker=$(":header:contains('"+data.sections[serieskey].title+"')").nextUntil($(":header"));
               var chapterlinks=walker.find("a");
               chapterlinks.each(function(){
-                if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,3}$/g)){
+                if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,4}$/g)){
                   //
                   var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parents().first().text();
                   var chapterdata={};
