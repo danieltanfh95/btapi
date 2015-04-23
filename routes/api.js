@@ -67,6 +67,55 @@ function lastUpdatesTimeByDownload(req,res){
         res.send(data);
       });
     });
+  }else if(postdata.updates){
+    //returns the latest newest pages up to a certain number
+    //Mediawiki limits the output to 500 so there might a few calls before you get all the data you need.
+    var continuekey="";
+    var data=[];
+    var maxmatches=100;
+    function getLatestRevision() {
+      var url="http://www.baka-tsuki.org/project/api.php?action=query&list=recentchanges&format=json&rclimit="+maxmatches;
+      if(continuekey){
+        url+="&rccontinue="+continuekey;
+      }
+      if(postdata.from){
+        //The date and time to start listing changes
+        //Note that this must be in YYYY-MM-DDTHH:MM:SSZ format
+        url+="&rcend="+postdata.from;
+      }
+      if(postdata.until && postdata.from){
+        //The date and time to end listing changes
+        //Note that this must be in YYYY-MM-DDTHH:MM:SSZ format
+        url+="&rcstart="+postdata.until;
+      }
+      download(url, function(resd){
+        var jsondata=JSON.parse(resd);
+        var edits=jsondata.query.recentchanges;
+        if(jsondata["query-continue"] && jsondata["query-continue"].recentchanges){
+          continuekey= jsondata["query-continue"].recentchanges.rccontinue;
+        }
+        for(var key in edits){
+          if (edits[key].type=="new" && data.length<postdata.updates ){
+            if(!edits[key].title.match(/^User|^Talk/g)){
+              var obj={};
+              obj.title=edits[key].title;
+              obj.pageid=edits[key].pageid;
+              obj.timestamp=edits[key].timestamp;
+              obj.revid=edits[key].revid;
+              data.push(obj);           
+            }
+          }
+        }
+        console.log("download end", data.length, edits.length);
+        if(edits.length<maxmatches || data.length>=postdata.updates){          
+          res.send(data);
+        }else{
+          getLatestRevision();
+        }
+      })
+    }
+    //Start the recursive function
+    getLatestRevision();
   }
 }
 
