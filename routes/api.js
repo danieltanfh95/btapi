@@ -97,7 +97,7 @@ function lastUpdatesTimeByDownload(req,res){
         }
         for(var key in edits){
           if (edits[key].type=="new" && data.length<postdata.updates ){
-            if(!edits[key].title.match(/^User|^Talk/g)){
+            if(!edits[key].title.match(/^User|^Talk|Registration/i)){
               var obj={};
               obj.title=edits[key].title;
               obj.pageid=edits[key].pageid;
