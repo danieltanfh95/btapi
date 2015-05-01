@@ -20,7 +20,15 @@ router.get('/category',function(req,res){
   }else{
     seriesLanguageFilterByDownload(req,res);
   }  
-  
+})
+
+router.get('/genre',function(req,res){
+  var postdata=req.query;
+  if(Object.keys(postdata).length<1){
+    res.redirect('/genre');
+  }else{
+    seriesGenreFilterByDownload(req,res);
+  }  
 })
 
 router.get('/time',function(req,res){
@@ -32,6 +40,58 @@ router.get('/time',function(req,res){
   }  
   
 })
+
+function seriesGenreFilterByDownload(req,res){
+  var postdata=req.query;
+  if(postdata.list){
+    var tempdata={};
+    var data={};
+    var genreList=postdata.list.split("|");
+    data.genres=postdata.list.split("|");
+    data.titles=[];
+    function mergeObjects(obj1, obj2){
+      var finalobj={};
+      if(Object.keys(obj1).length>0 && Object.keys(obj2).length>0){
+        for(var key in obj1){
+          if(obj2[key]){
+            finalobj[key]=obj2[key];
+          }
+        }
+      }else if(Object.keys(obj1).length<=0 || Object.keys(obj2).length<=0){
+        finalobj = Object.keys(obj1).length>0 ? obj1 : obj2 ;
+      }
+      return finalobj;
+    }
+    function getAllGenres(){
+      var url = "http://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&generator=categorymembers&gcmlimit=500&gcmtype=page&format=json&gcmtitle=Category:Genre_-_";
+      if(genreList.length>0){
+        url+=capitalizeFirstLetter(genreList.pop());
+        download(url,function(resd){
+          var jsondata=JSON.parse(resd);
+          if(jsondata.query && jsondata.query.pages){
+            tempdata=mergeObjects(tempdata,jsondata.query.pages);
+          }
+          getAllGenres();
+        })
+      }else{
+        //Reorganise the data
+        console.log(data.genres);
+        for(var val in tempdata){
+          var obj ={};
+          var title=tempdata[val];
+          obj.page=title.title.replace(/ /g,"_");
+          obj.title=title.title;
+          obj.lastreviseddate=title.revisions[0].timestamp;
+          obj.lastrevisedid=title.lastrevid;
+          obj.pageid=title.pageid;
+          data.titles.push(obj);
+        }
+        res.send(data);
+      }      
+    }
+    getAllGenres();
+  }
+}
 
 function lastUpdatesTimeByDownload(req,res){
   var postdata=req.query; 
@@ -181,7 +241,7 @@ function seriesLanguageFilterByDownload(req,res){
       }
       res.send(data);
     })
-  }else if(postdata.type.match(/Original_?novel/i)){
+  }else if(postdata.type && postdata.type.match(/Original_?novel/i)){
     //Directly provide all Original Novels available as they are not divided by language.
     download("http://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:Original_novel", function(resd){
       var data={};

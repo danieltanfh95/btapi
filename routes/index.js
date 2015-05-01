@@ -18,4 +18,7 @@ router.get('/time', function(req, res) {
   res.render('time', { title: 'Express'});
 });
 
+router.get('/genre', function(req, res) {
+  res.render('genre', { title: 'Express'});
+});
 module.exports = router;

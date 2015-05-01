@@ -1,0 +1,92 @@
+extends layout
+
+block content
+  h3 Genre Search
+  h5 route: "/api/genre"
+  h5 return: JSON
+  h5 format: /api/genre?list={list_of_genres}
+  br
+  h4 
+    u Filter Parameters
+
+  h5 By list
+  a(href="/api?list=action|romance")
+    /api?title=Zero_no_Tsukaima 
+  p 
+    | This parameter 
+    b must be present 
+    | to continue. The values are separated by a 
+    b pipe ("|")
+    | character. It is 
+    b case-insensitive.
+
+  br
+
+  h4 
+    u JSON properties
+
+  h5 genres
+  p (STRING) The list of genres that have been queried.
+
+  h5 titles
+  p (LIST) JSON data of the titles.
+  ul
+    li 
+      h5 title
+      p (STRING) title name of the book
+    li 
+      h5 page
+      p (STRING) interwiki main page title of the book.
+    li 
+      h5 lastreviseddate
+      p (STRING) The data and time of the last revision, in UTC+0.
+    li 
+      h5 lastrevisedid
+      p (NUMBER) the unique id of the last revison.
+    li 
+      h5 pageid
+      p (NUMBER) the unique id of the main page of the book
+
+  br
+  h4 Example JSON 
+  a(href="/api/genre?list=shoujo|comedy")
+    code /api/genre?list=shoujo|comedy
+  br
+  .form-group
+    textarea.form-control(rows="95", disabled).
+      {
+        "genres": [
+          "shoujo",
+          "comedy"
+        ],
+        "titles": [
+          {
+            "page": "Ghost_Hunt",
+            "title": "Ghost Hunt",
+            "lastreviseddate": "2015-04-28T13:53:23Z",
+            "lastrevisedid": 439935,
+            "pageid": 2974
+          },
+          {
+            "page": "Maru-MA",
+            "title": "Maru-MA",
+            "lastreviseddate": "2015-04-29T20:12:28Z",
+            "lastrevisedid": 440287,
+            "pageid": 19977
+          },
+          {
+            "page": "Ojamajo_Doremi_16",
+            "title": "Ojamajo Doremi 16",
+            "lastreviseddate": "2015-04-29T13:23:20Z",
+            "lastrevisedid": 440175,
+            "pageid": 47518
+          },
+          {
+            "page": "Maru-MA_~_(Italian)",
+            "title": "Maru-MA ~ (Italian)",
+            "lastreviseddate": "2015-04-30T14:07:42Z",
+            "lastrevisedid": 440410,
+            "pageid": 74307
+          }
+        ]
+      }
