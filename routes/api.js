@@ -265,7 +265,7 @@ function seriesTitleFilterByDownload(req,res){
 
   // Continue only if series title is available.
   if(postdata.title){
-    download("http://baka-tsuki.org/project/api.php?action=parse&format=json&prop=text&page="+postdata.title, function(resd){
+    download("http://www.baka-tsuki.org/project/api.php?action=parse&format=json&prop=text&page="+postdata.title, function(resd){
       var data={};
       var jsondata=JSON.parse(resd);
 

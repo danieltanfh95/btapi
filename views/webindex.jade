@@ -1,0 +1,76 @@
+doctype html.no-js(lang='en')
+head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700', rel='stylesheet', type='text/css')
+    link(rel='stylesheet', href='stylesheets/webreset.css')
+    // CSS reset
+    link(rel='stylesheet', href='stylesheets/webstyle.css')
+    // Resource style
+    script(src='javascripts/modernizr.js')
+    // Modernizr
+    title baka-tsuki web 
+  body
+    header.cd-header
+      //
+        #cd-logo
+          a(href='#0')
+            img(src='images/cd-logo.svg', alt='Logo')
+      nav.cd-primary-nav
+        ul
+          li
+            a(href='#0') Home
+          li
+            a(href='#0') Portfolio
+          li
+            a(href='#0') Contact
+      // .cd-primary-nav
+    section.cd-hero
+      ul.cd-hero-slider
+        li.selected
+          .cd-half-width
+            h2 Baka Tsuki Web Reader
+            p A simple, responsive reader for the web
+            a.cd-btn(href='http://www.baka-tsuki.org/project/index.php?title=Main_Page') Wiki Site
+          .cd-half-width.cd-img-container
+            img(src='images/Saekano.jpg', alt='tech 1')
+          // .cd-full-width
+        li
+          .cd-half-width.cd-img-container
+            img(src='images/DAL_v01_cover.jpg', alt='Volume 1')
+          .cd-half-width
+            h2 Featured: Date A Live
+            p
+              | "—You, have you come to kill me too?"
+            p
+              | Date A Live (デート・ア・ライブ), is a Japanese light novel series written by Tachibana Koushi (橘公司), with illustrations by Tsunako (つなこ), published by Fujimi Shobo under their Fujimi Fantasia Bunko label.
+            a.cd-btn(href='#0') Start
+            a.cd-btn.secondary(href='#0') Learn More
+          // .cd-half-width
+          
+          // .cd-half-width.cd-img-container
+        li
+          .cd-half-width.cd-img-container
+            img(src='images/TR_v08_cover.jpg', alt='Volume 8')
+          .cd-half-width
+            h2 Featured: Tokyo Ravens
+            p
+              | "Do you know what the heart of magic is? The answer is 'lies.'"
+            p
+              | Tokyo Ravens (レイヴンズ) is a Japanese light novel written by Kōhei Azano and illustrated by Sumihei.
+            a.cd-btn(href='#0') Start
+            a.cd-btn.secondary(href='#0') Learn More
+
+      .cd-slider-nav
+        nav
+          span.cd-marker.item-1
+          ul
+            li.selected
+              a(href='#0') Intro
+            li
+              a(href='#0') Featured 1
+            li
+              a(href='#0') Featured 2
+    script(src='javascripts/jquery-2.1.1.js')
+    script(src='javascripts/slider.js')
+    // Resource jQuery

@@ -21,4 +21,9 @@ router.get('/time', function(req, res) {
 router.get('/genre', function(req, res) {
   res.render('genre', { title: 'Express'});
 });
+
+router.get('/reader', function(req, res) {
+  res.render('webindex', { title: 'Express'});
+});
+
 module.exports = router;
