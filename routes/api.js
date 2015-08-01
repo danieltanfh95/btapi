@@ -410,8 +410,9 @@ function seriesTitleFilterByDownload(req,res){
               var chapterlinks=walker.find("a");
               //console.log(heading.text());
               chapterlinks.each(function(){
-                //Remove red links to pages that does not exist too.              
-                if(!$(this).attr('href').match(/edit|\=Template|\.\w{0,4}$/g)){
+                //Remove red links to pages that does not exist too.  
+                //Include external links          
+                if(!$(this).attr('href').match(/edit|Template/g)){
                   var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parent().first().text();
                   var chapterdata={};
                   chapterdata.title=titletext;
@@ -523,8 +524,8 @@ function seriesTitleFilterByDownload(req,res){
             var tempvol=[];
             for(var volumekey in data.sections[serieskey].books){
               //Non number input will be removed
-              var re = new RegExp("volume.?"+postdata.volumeno.match(/\d+/g), 'i');
-              if(data.sections[serieskey].books[volumekey].title.match(re)){
+              var re1 = new RegExp("volume.?"+postdata.volumeno.match(/\d+/g)+"$", 'i');
+              if(data.sections[serieskey].books[volumekey].title.match(/\w+ ?\d+/gi)[0].match(re1) != null){
                 tempvol.push(data.sections[serieskey].books[volumekey]);
               }
             }
