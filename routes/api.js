@@ -94,35 +94,23 @@ function seriesGenreFilterByDownload(req,res){
 function lastUpdatesTimeByDownload(req,res){
   var postdata=req.query; 
   if(postdata.titles||postdata.pageids){
-    downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&titles="+postdata.titles, function(resd){
-      var titledata=resd;
-      console.log(titledata);
-      downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&pageids="+postdata.pageids, function(resd){
-        var pagedata=resd;
-        var data=[];
-        if(titledata.query.normalized[0].from!="undefined"){
-          var pages=titledata.query.pages;
-          for(var title in pages){
-            var obj={};
-            obj.title=pages[title].title;
-            obj.pageid=pages[title].pageid;
-            obj.lastrevisedid=pages[title].lastrevid;
-            obj.lastreviseddate=pages[title].revisions[0].timestamp
-            data.push(obj);
-          }
-        }
-        if(!pagedata.query.pages[0]){
-          var pages=pagedata.query.pages;
-          for(var title in pages){
-            var obj={};
-            obj.title=pages[title].title;
-            obj.pageid=pages[title].pageid;
-            obj.lastrevisedid=pages[title].lastrevid;
-            obj.lastreviseddate=pages[title].revisions[0].timestamp;
-            data.push(obj);
-          }
-        }
-        res.send(data);
+    downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&titles="+postdata.titles, function(titledata){
+      downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&pageids="+postdata.pageids, function(pagedata){
+        res.send([titledata.query.normalized[0].from!="undefined" ?
+                  titledata.query.pages.map(function(ele){ return {
+                    "title": ele.title,
+                    "pageid": ele.pageid,
+                    "lastrevisedid": ele.lastrevid,
+                    "lastreviseddate": ele.revisions[0].timestamp
+                  };}) : null,
+                  !pagedata.query.pages[0] ?
+                  pagedata.query.pages.map(function(ele){ return {
+                    "title": ele.title,
+                    "pageid": ele.pageid,
+                    "lastrevisedid": ele.lastrevid,
+                    "lastreviseddate": ele.revisions[0].timestamp
+                  };}) : null ]
+                  .filter(function(ele){return ele!=null;}));
       });
     });
   }else if(postdata.updates){
@@ -176,6 +164,7 @@ function lastUpdatesTimeByDownload(req,res){
   }
 }
 
+//Use transducers instead of for loops
 function seriesLanguageFilterByDownload(req,res){
   var postdata=req.query;
   if(postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
