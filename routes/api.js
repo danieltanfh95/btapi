@@ -1,6 +1,6 @@
 var express = require('express');
 var cheerio= require('cheerio');
-var http=require('http');
+var https=require('httpss');
 var router = express.Router();
 
 /* New parsing method */
@@ -62,7 +62,7 @@ function seriesGenreFilterByDownload(req,res){
       return finalobj;
     }
     function getAllGenres(){
-      var url = "http://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&generator=categorymembers&gcmlimit=500&gcmtype=page&format=json&gcmtitle=Category:Genre_-_";
+      var url = "https://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&generator=categorymembers&gcmlimit=500&gcmtype=page&format=json&gcmtitle=Category:Genre_-_";
       if(genreList.length>0){
         url+=capitalizeFirstLetter(genreList.pop());
         download(url,function(resd){
@@ -94,9 +94,9 @@ function seriesGenreFilterByDownload(req,res){
 function lastUpdatesTimeByDownload(req,res){
   var postdata=req.query; 
   if(postdata.titles||postdata.pageids){
-    download("http://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&format=json&titles="+postdata.titles, function(resd){
+    download("https://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&format=json&titles="+postdata.titles, function(resd){
       var titledata=JSON.parse(resd);
-      download("http://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&format=json&pageids="+postdata.pageids, function(resd){
+      download("https://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&format=json&pageids="+postdata.pageids, function(resd){
         var pagedata=JSON.parse(resd);
         var data=[];
         if(titledata.query.normalized[0].from!="undefined"){
@@ -132,7 +132,7 @@ function lastUpdatesTimeByDownload(req,res){
     var data=[];
     var maxmatches=200;
     function getLatestRevision() {
-      var url="http://www.baka-tsuki.org/project/api.php?action=query&list=recentchanges&format=json&rclimit="+maxmatches;
+      var url="https://www.baka-tsuki.org/project/api.php?action=query&list=recentchanges&format=json&rclimit="+maxmatches;
       if(continuekey){
         url+="&rccontinue="+continuekey;
       }
@@ -182,7 +182,7 @@ function seriesLanguageFilterByDownload(req,res){
     var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     var category =titletype+"_("+language+")";
-    download("http://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&generator=categorymembers&gcmlimit=500&gcmtype=page&format=json&gcmtitle=Category:"+category, function(resd){
+    download("https://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&generator=categorymembers&gcmlimit=500&gcmtype=page&format=json&gcmtitle=Category:"+category, function(resd){
       var data={};
       var jsondata=JSON.parse(resd);
       var serieslist=jsondata.query.pages;
@@ -204,7 +204,7 @@ function seriesLanguageFilterByDownload(req,res){
   }else if(postdata.language && !postdata.type){
     //Only provide a list of title types for the language
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
-    download("http://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:"+language, function(resd){
+    download("https://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:"+language, function(resd){
       var data={};
       var jsondata=JSON.parse(resd);
       var serieslist=jsondata.query.categorymembers;
@@ -222,7 +222,7 @@ function seriesLanguageFilterByDownload(req,res){
   }else if(postdata.type && !postdata.type.match(/Original_?novel/i) && !postdata.language){
     //Provide languages available for that type.
     var titletype =capitalizeFirstLetter(postdata.type.toLowerCase());
-    download("http://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:"+titletype, function(resd){
+    download("https://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:"+titletype, function(resd){
       var data={};
       var jsondata=JSON.parse(resd);
       var serieslist=jsondata.query.categorymembers;      
@@ -238,7 +238,7 @@ function seriesLanguageFilterByDownload(req,res){
     })
   }else if(postdata.type && postdata.type.match(/Original_?novel/i)){
     //Directly provide all Original Novels available as they are not divided by language.
-    download("http://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:Original_novel", function(resd){
+    download("https://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:Original_novel", function(resd){
       var data={};
       var jsondata=JSON.parse(resd);
       var serieslist=jsondata.query.categorymembers;
@@ -260,7 +260,7 @@ function seriesTitleFilterByDownload(req,res){
 
   // Continue only if series title is available.
   if(postdata.title){
-    download("http://www.baka-tsuki.org/project/api.php?action=parse&format=json&prop=text&page="+postdata.title, function(resd){
+    download("https://www.baka-tsuki.org/project/api.php?action=parse&format=json&prop=text&page="+postdata.title, function(resd){
       var data={};
       var jsondata=JSON.parse(resd);
 
@@ -276,7 +276,7 @@ function seriesTitleFilterByDownload(req,res){
         data.synopsis="";
         data.cover=$(".thumbinner").find("img").attr('src');
         if (data.cover && data.cover.match(/^\/project/g)){
-          data.cover="http://www.baka-tsuki.org"+data.cover;
+          data.cover="https://www.baka-tsuki.org"+data.cover;
         }
         
         var synopsiswalk = $(":header").filter(function(){
@@ -389,7 +389,7 @@ function seriesTitleFilterByDownload(req,res){
                   var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
                   chapterdata.linktype=linktype;
                   if(linktype=="internal"){
-                    chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
+                    chapterdata.link="https://www.baka-tsuki.org"+$(this).attr('href');
                   }else{
                     chapterdata.link=$(this).attr('href');
                   }
@@ -410,7 +410,7 @@ function seriesTitleFilterByDownload(req,res){
                   var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
                   chapterdata.linktype=linktype;
                   if(linktype=="internal"){
-                    chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
+                    chapterdata.link="https://www.baka-tsuki.org"+$(this).attr('href');
                   }else{
                     chapterdata.link=$(this).attr('href');
                   }
@@ -424,7 +424,7 @@ function seriesTitleFilterByDownload(req,res){
                 if(coverimg){
                   coverimgsrc=coverimg.attr('src');
                   if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
-                    coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+                    coverimgsrc="https://www.baka-tsuki.org"+coverimgsrc;
                   }
                   data.sections[serieskey].books[volumekey].cover=coverimgsrc;
                 }
@@ -433,7 +433,7 @@ function seriesTitleFilterByDownload(req,res){
                 if(coverimg){
                   coverimgsrc=coverimg.attr('src');
                   if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
-                    coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+                    coverimgsrc="https://www.baka-tsuki.org"+coverimgsrc;
                   }
                   data.sections[serieskey].books[volumekey].cover=coverimgsrc;
                 }
@@ -442,7 +442,7 @@ function seriesTitleFilterByDownload(req,res){
                 if(coverimg){
                   coverimgsrc=coverimg.attr('src');
                   if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
-                    coverimgsrc="http://www.baka-tsuki.org"+coverimgsrc;
+                    coverimgsrc="https://www.baka-tsuki.org"+coverimgsrc;
                   }
                   data.sections[serieskey].books[volumekey].cover=coverimgsrc;
                 }
@@ -463,7 +463,7 @@ function seriesTitleFilterByDownload(req,res){
                   var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
                   chapterdata.linktype=linktype;
                   if(linktype=="internal"){
-                    chapterdata.link="http://www.baka-tsuki.org"+$(this).attr('href');
+                    chapterdata.link="https://www.baka-tsuki.org"+$(this).attr('href');
                   }else{
                     chapterdata.link=$(this).attr('href');
                   }
@@ -538,7 +538,7 @@ function stripNumbering(line){
 }
 
 function download(url, callback) {
-  http.get(encodeURI(url), function(res) {
+  https.get(encodeURI(url), function(res) {
     var data = "";
     res.on('data', function (chunk) {
       data += chunk;
