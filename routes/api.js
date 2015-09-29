@@ -12,6 +12,7 @@ router.get('/',function(req,res){
     seriesTitleFilterByDownload(req,res);
   }  
 })
+
 router.get('/category',function(req,res){
   var postdata=req.query;
   if(Object.keys(postdata).length<1){
@@ -94,9 +95,10 @@ function seriesGenreFilterByDownload(req,res){
 function lastUpdatesTimeByDownload(req,res){
   var postdata=req.query; 
   if(postdata.titles||postdata.pageids){
-    download("https://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&format=json&titles="+postdata.titles, function(resd){
+    download("https://www.baka-tsuki.org/project/api.php?format=json&action=query&prop=info|revisions&titles="+postdata.titles, function(resd){
       var titledata=JSON.parse(resd);
-      download("https://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&format=json&pageids="+postdata.pageids, function(resd){
+      console.log(titledata);
+      download("https://www.baka-tsuki.org/project/api.php?format=json&action=query&prop=info|revisions&pageids="+postdata.pageids, function(resd){
         var pagedata=JSON.parse(resd);
         var data=[];
         if(titledata.query.normalized[0].from!="undefined"){
