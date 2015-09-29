@@ -11,7 +11,6 @@ router.get('/',function(req,res){
   }else{
     seriesTitleFilterByDownload(req,res);
   }  
-  //console.log(res);
 })
 router.get('/category',function(req,res){
   var postdata=req.query;
@@ -75,7 +74,6 @@ function seriesGenreFilterByDownload(req,res){
         })
       }else{
         //Reorganise the data
-        console.log(data.genres);
         for(var val in tempdata){
           var obj ={};
           var title=tempdata[val];
@@ -102,7 +100,6 @@ function lastUpdatesTimeByDownload(req,res){
         var pagedata=JSON.parse(resd);
         var data=[];
         if(titledata.query.normalized[0].from!="undefined"){
-          console.log(titledata.query);
           var pages=titledata.query.pages;
           for(var title in pages){
             var obj={};
@@ -167,7 +164,6 @@ function lastUpdatesTimeByDownload(req,res){
             }
           }
         }
-        //console.log("download end", data.length, edits.length);
         if(edits.length<maxmatches || data.length>=postdata.updates){          
           res.send(data);
         }else{
@@ -193,7 +189,6 @@ function seriesLanguageFilterByDownload(req,res){
       data.type=titletype;
       data.language=language;
       data.titles=[];
-      console.log(serieslist.length);
       for(var key in serieslist){
         var title=serieslist[key].title;
         var titledata={}
@@ -269,9 +264,9 @@ function seriesTitleFilterByDownload(req,res){
       var data={};
       var jsondata=JSON.parse(resd);
 
+
       if(jsondata.parse && jsondata.parse.text){
         var $=cheerio.load(jsondata.parse.text["*"]);
-        //console.log($(".toc").text());
         //Preload the data for the light novel
         data.title=jsondata.parse.title;
         data.sections=[];
@@ -290,7 +285,6 @@ function seriesTitleFilterByDownload(req,res){
         var synopsisstring="";
         synopsiswalk.each(function(){  
           if($(this).text()){
-            //console.log(synopsisstring, $(this).text());
             synopsisstring+=$(this).text();
           }          
         })
@@ -312,12 +306,10 @@ function seriesTitleFilterByDownload(req,res){
 
         //Completed Preloading of Data
         //Get data about available volumes from the toc
-        //console.log($("ul"));
         $("#toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
           if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full/i) && $(this).hasClass("toclevel-1")){         
             //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
-            //console.log($(this).text())
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
             var volumesnames=volumelist.slice(1,volumelist.length);
             var seriesname=stripNumbering(volumelist[0]);
@@ -340,13 +332,13 @@ function seriesTitleFilterByDownload(req,res){
         })
 
         //Sometimes the data for authors is hidden in the first paragraph instead
-        if(!data.author){
+        if(!data.author && $("p").text().match(/\sby\s(.+)\./i)){
           //Search for author name between "by" and a non-character or the word "and"
           var works=$("p").text().match(/\sby\s(.+)\./i)[1].split(/and|with/);
           var authorname=works[0].replace(/^\s+|\s+$/g, '');
           data.author=authorname;
         }
-        if(!data.illustrator){
+        if(!data.illustrator && $("p").text().match(/\sby\s(.+\.)/i)){
           var works=$("p").text().match(/\sby\s(.+\.)/i)[1].split(/and|with/);
           if(works[1]){
             var illustrator=works[1].match(/\sby\s(.+)\./i);  
@@ -362,7 +354,6 @@ function seriesTitleFilterByDownload(req,res){
         
         if(data.sections){
           //Determine the type of overall image placing
-          //console.log(data.sections[0].books);
           if(data.sections[0].books[0]){
             var volheading=$(":header:contains('"+data.sections[0].books[0].title+"')").first();
             var coverimage=volheading.prevUntil($(":header")).find("img");
@@ -408,7 +399,6 @@ function seriesTitleFilterByDownload(req,res){
               //Walk through the following sections for links until the next heading.
               var walker=heading.nextUntil($(":header"));
               var chapterlinks=walker.find("a");
-              //console.log(heading.text());
               chapterlinks.each(function(){
                 //Remove red links to pages that does not exist too.  
                 //Include external links          
@@ -548,7 +538,7 @@ function stripNumbering(line){
 }
 
 function download(url, callback) {
-  http.get(url, function(res) {
+  http.get(encodeURI(url), function(res) {
     var data = "";
     res.on('data', function (chunk) {
       data += chunk;
