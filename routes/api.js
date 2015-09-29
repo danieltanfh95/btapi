@@ -63,11 +63,10 @@ function seriesGenreFilterByDownload(req,res){
       return finalobj;
     }
     function getAllGenres(){
-      var url = "https://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&generator=categorymembers&gcmlimit=500&gcmtype=page&format=json&gcmtitle=Category:Genre_-_";
+      var url = "action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:Genre_-_";
       if(genreList.length>0){
         url+=capitalizeFirstLetter(genreList.pop());
-        download(url,function(resd){
-          var jsondata=JSON.parse(resd);
+        downloadJSONfromBakaTsukiMediaWiki(url,function(jsondata){
           if(jsondata.query && jsondata.query.pages){
             tempdata=mergeObjects(tempdata,jsondata.query.pages);
           }
@@ -95,11 +94,11 @@ function seriesGenreFilterByDownload(req,res){
 function lastUpdatesTimeByDownload(req,res){
   var postdata=req.query; 
   if(postdata.titles||postdata.pageids){
-    download("https://www.baka-tsuki.org/project/api.php?format=json&action=query&prop=info|revisions&titles="+postdata.titles, function(resd){
-      var titledata=JSON.parse(resd);
+    downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&titles="+postdata.titles, function(resd){
+      var titledata=resd;
       console.log(titledata);
-      download("https://www.baka-tsuki.org/project/api.php?format=json&action=query&prop=info|revisions&pageids="+postdata.pageids, function(resd){
-        var pagedata=JSON.parse(resd);
+      downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&pageids="+postdata.pageids, function(resd){
+        var pagedata=resd;
         var data=[];
         if(titledata.query.normalized[0].from!="undefined"){
           var pages=titledata.query.pages;
@@ -134,7 +133,7 @@ function lastUpdatesTimeByDownload(req,res){
     var data=[];
     var maxmatches=200;
     function getLatestRevision() {
-      var url="https://www.baka-tsuki.org/project/api.php?action=query&list=recentchanges&format=json&rclimit="+maxmatches;
+      var url="action=query&list=recentchanges&rclimit="+maxmatches;
       if(continuekey){
         url+="&rccontinue="+continuekey;
       }
@@ -148,8 +147,7 @@ function lastUpdatesTimeByDownload(req,res){
         //Note that this must be in YYYY-MM-DDTHH:MM:SSZ format
         url+="&rcstart="+postdata.until;
       }
-      download(url, function(resd){
-        var jsondata=JSON.parse(resd);
+      downloadJSONfromBakaTsukiMediaWiki(url, function(jsondata){
         var edits=jsondata.query.recentchanges;
         if(jsondata["query-continue"] && jsondata["query-continue"].recentchanges){
           continuekey= jsondata["query-continue"].recentchanges.rccontinue;
@@ -180,13 +178,13 @@ function lastUpdatesTimeByDownload(req,res){
 
 function seriesLanguageFilterByDownload(req,res){
   var postdata=req.query;
+    console.log("Heck?", postdata.language, postdata.type);
   if(postdata.language && postdata.type){
     var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     var category =titletype+"_("+language+")";
-    download("https://www.baka-tsuki.org/project/api.php?action=query&prop=info%7Crevisions&generator=categorymembers&gcmlimit=500&gcmtype=page&format=json&gcmtitle=Category:"+category, function(resd){
+    downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:"+category, function(jsondata){
       var data={};
-      var jsondata=JSON.parse(resd);
       var serieslist=jsondata.query.pages;
       data.type=titletype;
       data.language=language;
@@ -206,17 +204,15 @@ function seriesLanguageFilterByDownload(req,res){
   }else if(postdata.language && !postdata.type){
     //Only provide a list of title types for the language
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
-    download("https://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:"+language, function(resd){
+    downloadJSONfromBakaTsukiMediaWiki("action=query&cmlimit=400&list=categorymembers&cmtitle=Category:"+language, function(jsondata){
       var data={};
-      var jsondata=JSON.parse(resd);
       var serieslist=jsondata.query.categorymembers;
+      console.log(serieslist);
       data.language=language;
       data.types=[];
       for(var key in serieslist){
         if(serieslist[key].title.match(/Category/g)){
-          var typeoftitle=serieslist[key].title.replace(/Category:/g,"").split(/ /g);
-          typeoftitle.pop();
-          data.types.push(typeoftitle.join("_"));
+          data.types.push(popb(serieslist[key].title.replace(/Category:/g,"").split(/ /g)).join("_"));
         }
       }
       res.send(data);
@@ -224,9 +220,8 @@ function seriesLanguageFilterByDownload(req,res){
   }else if(postdata.type && !postdata.type.match(/Original_?novel/i) && !postdata.language){
     //Provide languages available for that type.
     var titletype =capitalizeFirstLetter(postdata.type.toLowerCase());
-    download("https://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:"+titletype, function(resd){
+    downloadJSONfromBakaTsukiMediaWiki("action=query&cmlimit=400&list=categorymembers&cmtitle=Category:"+titletype, function(jsondata){
       var data={};
-      var jsondata=JSON.parse(resd);
       var serieslist=jsondata.query.categorymembers;      
       data.types=titletype;
       data.language=[];
@@ -240,9 +235,8 @@ function seriesLanguageFilterByDownload(req,res){
     })
   }else if(postdata.type && postdata.type.match(/Original_?novel/i)){
     //Directly provide all Original Novels available as they are not divided by language.
-    download("https://www.baka-tsuki.org/project/api.php?action=query&cmlimit=400&format=json&list=categorymembers&cmtitle=Category:Original_novel", function(resd){
+    downloadJSONfromBakaTsukiMediaWiki("action=query&cmlimit=400&list=categorymembers&cmtitle=Category:Original_novel", function(jsondata){
       var data={};
-      var jsondata=JSON.parse(resd);
       var serieslist=jsondata.query.categorymembers;
       data.type="Original novel";
       data.titles=[];
@@ -262,11 +256,8 @@ function seriesTitleFilterByDownload(req,res){
 
   // Continue only if series title is available.
   if(postdata.title){
-    download("https://www.baka-tsuki.org/project/api.php?action=parse&format=json&prop=text&page="+postdata.title, function(resd){
-      var data={};
-      var jsondata=JSON.parse(resd);
-
-
+    downloadJSONfromBakaTsukiMediaWiki("action=parse&prop=text&page="+postdata.title, function(jsondata){
+      var data={};   
       if(jsondata.parse && jsondata.parse.text){
         var $=cheerio.load(jsondata.parse.text["*"]);
         //Preload the data for the light novel
@@ -535,19 +526,26 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function rest(arr){
+  return arr.slice(1, arr.length);
+}
+function popb(arr){
+  return arr.slice(0, arr.length-1);
+}
+
 function stripNumbering(line){
   line=line.replace(/^\s+|\s+$/g, '').split(/ /g);
   return line.slice(1,line.length).join(" ");
 }
 
-function download(url, callback) {
-  https.get(encodeURI(url), function(res) {
+function downloadJSONfromBakaTsukiMediaWiki(url_params, callback) {
+  https.get(encodeURI("https://www.baka-tsuki.org/project/api.php?format=json&"+url_params), function(res) {
     var data = "";
     res.on('data', function (chunk) {
       data += chunk;
     });
     res.on("end", function() {
-      callback(data);
+      callback(JSON.parse(data));
     });
   }).on("error", function() {
     callback(null);
