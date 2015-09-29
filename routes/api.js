@@ -1,6 +1,6 @@
 var express = require('express');
 var cheerio= require('cheerio');
-var https=require('httpss');
+var https=require('https');
 var router = express.Router();
 
 /* New parsing method */
@@ -308,7 +308,8 @@ function seriesTitleFilterByDownload(req,res){
         //Get data about available volumes from the toc
         $("#toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
-          if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full/i) && $(this).hasClass("toclevel-1")){         
+          //console.log($(this).text());
+          if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) && $(this).hasClass("toclevel-1")){       
             //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
             var volumesnames=volumelist.slice(1,volumelist.length);
@@ -327,10 +328,11 @@ function seriesTitleFilterByDownload(req,res){
               volumedata.chapters=[];
               seriesdata.books.push(volumedata);
             };
-            data.sections.push(seriesdata);
+            if(seriesdata.books.length>0){
+              data.sections.push(seriesdata);
+            }
           }          
         })
-
         //Sometimes the data for authors is hidden in the first paragraph instead
         if(!data.author && $("p").text().match(/\sby\s(.+)\./i)){
           //Search for author name between "by" and a non-character or the word "and"
@@ -350,7 +352,6 @@ function seriesTitleFilterByDownload(req,res){
           }
         }
                  
-
         
         if(data.sections){
           //Determine the type of overall image placing
