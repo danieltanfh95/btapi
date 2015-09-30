@@ -94,23 +94,28 @@ function seriesGenreFilterByDownload(req,res){
 function lastUpdatesTimeByDownload(req,res){
   var postdata=req.query; 
   if(postdata.titles||postdata.pageids){
-    downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&titles="+postdata.titles, function(titledata){
-      downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&pageids="+postdata.pageids, function(pagedata){
-        res.send([titledata.query.normalized[0].from!="undefined" ?
-                  titledata.query.pages.map(function(ele){ return {
-                    "title": ele.title,
-                    "pageid": ele.pageid,
-                    "lastrevisedid": ele.lastrevid,
-                    "lastreviseddate": ele.revisions[0].timestamp
-                  };}) : null,
-                  !pagedata.query.pages[0] ?
-                  pagedata.query.pages.map(function(ele){ return {
-                    "title": ele.title,
-                    "pageid": ele.pageid,
-                    "lastrevisedid": ele.lastrevid,
-                    "lastreviseddate": ele.revisions[0].timestamp
-                  };}) : null ]
-                  .filter(function(ele){return ele!=null;}));
+    downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&titles="+postdata.titles, function(resd){
+      var titledata=resd;
+      console.log(titledata);
+      downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&pageids="+postdata.pageids, function(resd){
+        var pagedata=resd;
+        var data=[
+            titledata.query.normalized[0].from!="undefined" ?
+            titledata.query.pages.map(function(ele){ return {
+              "title": ele.title,
+              "pageid": ele.pageid,
+              "lastrevisedid": ele.lastrevid,
+              "lastreviseddate": ele.revisions[0].timestamp
+            };}) : null,
+            !pagedata.query.pages[0] ?
+            pagedata.query.pages.map(function(ele){ return {
+              "title": ele.title,
+              "pageid": ele.pageid,
+              "lastrevisedid": ele.lastrevid,
+              "lastreviseddate": ele.revisions[0].timestamp
+            };}) : null
+            ];
+        res.send(data);
       });
     });
   }else if(postdata.updates){
