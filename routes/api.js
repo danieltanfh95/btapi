@@ -127,7 +127,7 @@ function lastUpdatesTimeByDownload(postdata,res){
         if(edits.length<maxmatches || data.length>=postdata.updates){          
           res.send(data);
         }else{
-          getLatestRevision(continuekey,maxmatches);
+          getLatestRevision(continuekey,maxmatches,data);
         }
       })
     }
