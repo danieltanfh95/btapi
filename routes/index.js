@@ -3,27 +3,27 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res) {
-  res.render('index', { title: 'Express'});
+  res.render('index.html');
 });
 
 router.get('/series', function(req, res) {
-  res.render('series', { title: 'Express'});
+  res.render('series.html');
 });
 
 router.get('/category', function(req, res) {
-  res.render('category', { title: 'Express'});
+  res.render('category.html');
 });
 
 router.get('/time', function(req, res) {
-  res.render('time', { title: 'Express'});
+  res.render('time.html');
 });
 
 router.get('/genre', function(req, res) {
-  res.render('genre', { title: 'Express'});
+  res.render('genre.html');
 });
 
 router.get('/reader', function(req, res) {
-  res.render('webindex', { title: 'Express'});
+  res.render('webindex.html');
 });
 
 module.exports = router;
