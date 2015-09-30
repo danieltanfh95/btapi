@@ -5,8 +5,34 @@ html
     link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/jquery.jsonview.css')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css')
   body
+    nav.navbar.navbar-default.navbar-fixed-top(style="height:50px;")
+      .container-fluid
+        .navbar-header
+          button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1')
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand(href='#') Home
+        .collapse.navbar-collapse
+          ul.nav.navbar-nav
+            li
+              a(href='https://github.com/Shadowys/btapi', data-toggle='tooltip', data-placement='right', title='', data-original-title='Source code here!')
+                i.fa.fa-github.fa-2x 
+            li
+              a(href='https://www.baka-tsuki.org/forums/viewtopic.php?f=84&t=10959', data-toggle='tooltip', data-placement='right', title='', data-original-title='Share your thoughts')
+                i.fa.fa-commenting.fa-2x 
+          ul.nav.navbar-nav.navbar-right
+            li
+              a(href='#') Top
     block content
     script(src='javascripts/jquery-2.1.1.js')
+    script(src='javascripts/bootstrap.min.js')
     script(src='javascripts/jquery.jsonview.js')
+    script.
+      $(document).ready(function () {
+        $("[data-toggle='tooltip']").tooltip();
+      });
     block scripts

@@ -1,5 +1,5 @@
 body {
-  padding: 50px;
+  padding: 100px;
   font-size: 16px ;
 }
 
@@ -10,7 +10,17 @@ code {
 .hide{
   display: none;
 }
-.toc{
+#toc{
   width: 100%;
   background-color: aliceblue;
+}
+@media(min-width: 768px){
+  .mobile-only{
+    display:none;
+  }
+}
+.tooltip > .tooltip-inner {background-color: black;}
+.tooltip.in {
+  opacity: 0.95;
+  filter: alpha(opacity=95);
 }
