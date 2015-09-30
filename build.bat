@@ -1,0 +1,1 @@
+start jade -w ./views -o ./public
