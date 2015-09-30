@@ -10,3 +10,7 @@ code {
 .hide{
   display: none;
 }
+.toc{
+  width: 100%;
+  background-color: aliceblue;
+}

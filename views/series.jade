@@ -1,124 +1,130 @@
 extends layout
 
 block content
-  .col-md-7
-  h3 Light Novel Search
-  h5 route: "/api"
-  h5 return: JSON
-  h5 format: /api?title={light_novel_title}[&series={regex_of_series_name}][&volume={regex_of_volume_name}][&volumeno={volume_number}]
-  br
-  h4 
-    u Filter Parameters
-
-  h5 By title
-  a(href="/api?title=Zero_no_Tsukaima")
-    /api?title=Zero_no_Tsukaima 
-  p 
-    | This parameter 
-    b must be present 
-    | to continue.
-
-  h5 By series (Optional)
-  a(href="/api?title=Chrome_Shelled_Regios&series=chrome|regios")
-    /api?title=Chrome_Shelled_Regios&series=chrome|regios 
-  p 
-    | This parameter can be a 
-    b regex 
-    | of the series name. The example above uses the pipe character.
-
-  h5 By volume (Optional)
-  a(href="/api?title=Chrome_Shelled_Regios&series=chrome&volume=15|log")
-    /api?title=Chrome_Shelled_Regios&series=chrome&volume=15|log 
-  p 
-    | This parameter can be a 
-    b regex 
-    | of the volume name, which includes the volume number. The example above uses the pipe character.
-
-  h5 By volume number (Optional)
-  a(href="/api?title=Chrome_Shelled_Regios&series=chrome&volumeno=1")
-    /api?title=Chrome_Shelled_Regios&series=chrome&volumeno=1 
-  p 
-    | This parameter must be a 
-    b number
-    | . Other characters will be removed.
-
-
-  br
-  .col-md-7
+  .toc
+    p Table of Contents
+    ul
+      li 
+        a(href="#LNS") Light Novel Search
+      li 
+        a(href="#Example") JSON example
+  .wrapper
+    h3#LNS Light Novel Search
+    route: "/api"
+    return: JSON
+    format: /api?title={light_novel_title}[&series={regex_of_series_name}][&volume={regex_of_volume_name}][&volumeno={volume_number}]
+    br
     h4 
+      u Filter Parameters
+
+    h5 By title
+    a(href="/api?title=Zero_no_Tsukaima")
+      /api?title=Zero_no_Tsukaima 
+    p 
+      | This parameter 
+      b must be present 
+      | to continue.
+
+    h5 By series (Optional)
+    a(href="/api?title=Chrome_Shelled_Regios&series=chrome|regios")
+      /api?title=Chrome_Shelled_Regios&series=chrome|regios 
+    p 
+      | This parameter can be a 
+      b regex 
+      | of the series name. The example above uses the pipe character.
+
+    h5 By volume (Optional)
+    a(href="/api?title=Chrome_Shelled_Regios&series=chrome&volume=15|log")
+      /api?title=Chrome_Shelled_Regios&series=chrome&volume=15|log 
+    p 
+      | This parameter can be a 
+      b regex 
+      | of the volume name, which includes the volume number. The example above uses the pipe character.
+
+    h5 By volume number (Optional)
+    a(href="/api?title=Chrome_Shelled_Regios&series=chrome&volumeno=1")
+      /api?title=Chrome_Shelled_Regios&series=chrome&volumeno=1 
+    p 
+      | This parameter must be a 
+      b number
+      | . Other characters will be removed.
+
+
+    h4#Example
       u JSON properties
+    .row
+      .col-md-7
+        h5 title
+        p (STRING) The title of the light novel
 
-    h5 title
-    p (STRING) The title of the light novel
+        h5 status
+        p
+          | (STRING)The translation status of the light novel -- 
+          b active, idle, halted, abandoned, warning.
+        p
+          | Note: Unable to differentiate between completed and active, 
+          | since the data is not available in the wiki text.
 
-    h5 status
-    p
-      | (STRING)The translation status of the light novel -- 
-      b active, idle, halted, abandoned, warning.
-    p
-      | Note: Unable to differentiate between completed and active, 
-      | since the data is not available in the wiki text.
+        h5 author
+        p (STRING) The author of the light novel
 
-    h5 author
-    p (STRING) The author of the light novel
+        h5 illustrator
+        p (STRING) The illustrator of the light novel
 
-    h5 illustrator
-    p (STRING) The illustrator of the light novel
+        h5 synopsis 
+        p (STRING) The synopsis of the light novel
+        p Note: If synopsis heading unavailable, it will show all paragraphs with the title.
 
-    h5 synopsis 
-    p (STRING) The synopsis of the light novel
-    p Note: If synopsis heading unavailable, it will show all paragraphs with the title.
+        h5 one_off
+        p (BOOL) Is the light novel is one-off?
+        p Note: A one-off novel is defined as not having any listed volumes.
 
-    h5 one_off
-    p (BOOL) Is the light novel is one-off?
-    p Note: A one-off novel is defined as not having any listed volumes.
+        h5 sections
+        p 
+          | (LIST) The light novel series available. The data is provided as 
+          b nested lists  
+          | which contain json to preserve the order. Each series contains a 
+          | list of volumes and each volume contains a list of chapters. 
+        p 
+          | Each chapter contains the 
+          b wiki link 
+          | to the page.
 
-    h5 sections
-    p 
-      | (LIST) The light novel series available. The data is provided as 
-      b nested lists  
-      | which contain json to preserve the order. Each series contains a 
-      | list of volumes and each volume contains a list of chapters. 
-    p 
-      | Each chapter contains the 
-      b wiki link 
-      | to the page.
-
-    ul 
-      li 
-        h5 title 
-        p (STRING) title of the series
-      li 
-        h5 books
-        p (LIST) volumes available for the series
-        ul
-          li
-            h5 title
-            p (STRING) title of the volume 
-            h5 cover
-            p (LINK) absolute link to the cover image of the volume
-            h5 chapters
-            p (LIST) chapters available for the volume, including external links
-            ul 
+        ul 
+          li 
+            h5 title 
+            p (STRING) title of the series
+          li 
+            h5 books
+            p (LIST) volumes available for the series
+            ul
               li
                 h5 title
-                p (STRING) title of the chapter
-                h5 page
-                p (STRING) title of the page of the chapter in the wiki or link of external page.
-                h5 linktype
-                p (STRING) type of link of the chapter page. Two options are available: internal and external
-                h5 link
-                p (LINK) absolute link to the chapter
+                p (STRING) title of the volume 
+                h5 cover
+                p (LINK) absolute link to the cover image of the volume
+                h5 chapters
+                p (LIST) chapters available for the volume, including external links
+                ul 
+                  li
+                    h5 title
+                    p (STRING) title of the chapter
+                    h5 page
+                    p (STRING) title of the page of the chapter in the wiki or link of external page.
+                    h5 linktype
+                    p (STRING) type of link of the chapter page. Two options are available: internal and external
+                    h5 link
+                    p (LINK) absolute link to the chapter
 
 
-    h5 cover
-    p (LINK) absolute link to the cover image of the novel
-  .col-md-5
-    h4 
-      | Example response using 
-    h4 
-      code /api?title=Hyouka&volumeno=1
-    #json_display
+        h5 cover
+        p (LINK) absolute link to the cover image of the novel
+      .col-md-5
+        h4 
+          | Example response using 
+        a(href="/api?title=Hyouka&volumeno=1")
+          code /api?title=Hyouka&volumeno=1
+        #json_display
 
 block scripts
   script.

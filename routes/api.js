@@ -143,17 +143,21 @@ function seriesLanguageFilterByDownload(postdata,res){
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     var category =titletype+"_("+language+")";
     downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:"+category, function(jsondata){
+      var data=[];
+      for(var ind in jsondata.query.pages){
+        var ele = jsondata.query.pages[ind];
+        data.push({
+          "page":ele.title.replace(/ /g,"_"),
+          "title":ele.title,
+          "lastreviseddate": ele.revisions[0].timestamp,
+          "lastrevisedid": ele.lastrevid,
+          "pageid": ele.pageid
+        });
+      }
       res.send({
         "type": titletype,
         "language": language,
-        "titles": jsondata.query.pages.map(function(ele){return {
-                      "page":ele.title.replace(/ /g,"_"),
-                      "title":ele.title,
-                      "lastreviseddate": ele.revisions[0].timestamp,
-                      "lastrevisedid": ele.lastrevid,
-                      "pageid": ele.pageid
-                    };
-                  })
+        "titles": data
       });
     })    
   }else if(postdata.language && !postdata.type){
