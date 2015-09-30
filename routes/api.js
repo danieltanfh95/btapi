@@ -96,7 +96,7 @@ function lastUpdatesTimeByDownload(req,res){
   if(postdata.titles||postdata.pageids){
     downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&titles="+postdata.titles, function(titledata){
       downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&pageids="+postdata.pageids, function(pagedata){
-        res.send([titledata.query.normalized[0].from!="undefined" ?
+        res.send([titledata.query.normalized[0].from!="undefined" && !titledata.query.pages["-1"]?
                   titledata.query.pages.map(function(ele){ return {
                     "title": ele.title,
                     "pageid": ele.pageid,
@@ -117,10 +117,7 @@ function lastUpdatesTimeByDownload(req,res){
     postdata.updates=postdata.updates.match(/\d/g).join("");
     //returns the latest newest pages up to a certain number
     //Mediawiki limits the output to 500 so there might a few calls before you get all the data you need.
-    var continuekey="";
-    var data=[];
-    var maxmatches=200;
-    function getLatestRevision() {
+    function getLatestRevision(continuekey,maxmatches,data) {
       var url="action=query&list=recentchanges&rclimit="+maxmatches;
       if(continuekey){
         url+="&rccontinue="+continuekey;
@@ -140,6 +137,8 @@ function lastUpdatesTimeByDownload(req,res){
         if(jsondata["query-continue"] && jsondata["query-continue"].recentchanges){
           continuekey= jsondata["query-continue"].recentchanges.rccontinue;
         }
+        //Here we can't use a map and filter because data.push is exponentially slow 
+        //as the pushed items gets bigger.
         for(var key in edits){
           if (edits[key].type=="new" && data.length<postdata.updates ){
             if(!edits[key].title.match(/^User|^Talk|Registration/i)){
@@ -155,12 +154,12 @@ function lastUpdatesTimeByDownload(req,res){
         if(edits.length<maxmatches || data.length>=postdata.updates){          
           res.send(data);
         }else{
-          getLatestRevision();
+          getLatestRevision(continuekey,maxmatches);
         }
       })
     }
     //Start the recursive function
-    getLatestRevision();
+    getLatestRevision(null,200,[]);
   }
 }
 
@@ -493,6 +492,7 @@ function seriesTitleFilterByDownload(req,res){
   }
 }
 
+//Utility functions
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
