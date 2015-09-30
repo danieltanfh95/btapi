@@ -4,65 +4,34 @@ var https=require('https');
 var router = express.Router();
 
 /* New parsing method */
-router.get('/',function(req,res){
+function routeHandler(req,res,route_name,callback){
   var postdata=req.query;
   if(Object.keys(postdata).length<1){
-    res.redirect('/series');
+    res.redirect(route_name);
   }else{
-    seriesTitleFilterByDownload(req,res);
+    callback(postdata,res);
   }  
+}
+router.get('/',function(req,res){
+  routeHandler(req,res,"/series",seriesTitleFilterByDownload);
 })
 
 router.get('/category',function(req,res){
-  var postdata=req.query;
-  if(Object.keys(postdata).length<1){
-    res.redirect('/category');
-  }else{
-    seriesLanguageFilterByDownload(req,res);
-  }  
+  routeHandler(req,res,"/category",seriesLanguageFilterByDownload);
 })
 
 router.get('/genre',function(req,res){
-  var postdata=req.query;
-  if(Object.keys(postdata).length<1){
-    res.redirect('/genre');
-  }else{
-    seriesGenreFilterByDownload(req,res);
-  }  
+  routeHandler(req,res,"/genre",seriesGenreFilterByDownload);
 })
 
 router.get('/time',function(req,res){
-  var postdata=req.query;
-  if(Object.keys(postdata).length<1){
-    res.redirect('/time');
-  }else{
-    lastUpdatesTimeByDownload(req,res);
-  }  
-  
+  routeHandler(req,res,"/time",lastUpdatesTimeByDownload)
 })
 
-function seriesGenreFilterByDownload(req,res){
-  var postdata=req.query;
-  if(postdata.list){
-    var tempdata={};
-    var data={};
-    var genreList=postdata.list.split("|");
-    data.genres=postdata.list.split("|");
-    data.titles=[];
-    function mergeObjects(obj1, obj2){
-      var finalobj={};
-      if(Object.keys(obj1).length>0 && Object.keys(obj2).length>0){
-        for(var key in obj1){
-          if(obj2[key]){
-            finalobj[key]=obj2[key];
-          }
-        }
-      }else if(Object.keys(obj1).length<=0 || Object.keys(obj2).length<=0){
-        finalobj = Object.keys(obj1).length>0 ? obj1 : obj2 ;
-      }
-      return finalobj;
-    }
-    function getAllGenres(){
+function seriesGenreFilterByDownload(postdata,res){
+  //var postdata=req.query;
+  if(postdata.list){    
+    function getAllGenres(genreList,tempdata){
       var url = "action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:Genre_-_";
       if(genreList.length>0){
         url+=capitalizeFirstLetter(genreList.pop());
@@ -70,29 +39,26 @@ function seriesGenreFilterByDownload(req,res){
           if(jsondata.query && jsondata.query.pages){
             tempdata=mergeObjects(tempdata,jsondata.query.pages);
           }
-          getAllGenres();
+          getAllGenres(genreList,tempdata);
         })
       }else{
         //Reorganise the data
-        for(var val in tempdata){
-          var obj ={};
-          var title=tempdata[val];
-          obj.page=title.title.replace(/ /g,"_");
-          obj.title=title.title;
-          obj.lastreviseddate=title.revisions[0].timestamp;
-          obj.lastrevisedid=title.lastrevid;
-          obj.pageid=title.pageid;
-          data.titles.push(obj);
-        }
-        res.send(data);
+        res.send({
+              "genres":postdata.list.split("|"),
+              "titles":tempdata.map(function(ele){return {
+                "page":ele.title.replace(/ /g,"_"),
+                "title":ele.title,
+                "lastreviseddate":ele.revisions[0].timestamp,
+                "lastrevisedid": ele.lastrevisedid,
+                "pageid":ele.pageid
+              };})});
       }      
     }
-    getAllGenres();
+    getAllGenres(postdata.list.split("|"),{});
   }
 }
 
-function lastUpdatesTimeByDownload(req,res){
-  var postdata=req.query; 
+function lastUpdatesTimeByDownload(postdata,res){
   if(postdata.titles||postdata.pageids){
     downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&titles="+postdata.titles, function(titledata){
       downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&pageids="+postdata.pageids, function(pagedata){
@@ -140,15 +106,14 @@ function lastUpdatesTimeByDownload(req,res){
         //Here we can't use a map and filter because data.push is exponentially slow 
         //as the pushed items gets bigger.
         for(var key in edits){
-          if (edits[key].type=="new" && data.length<postdata.updates ){
-            if(!edits[key].title.match(/^User|^Talk|Registration/i)){
-              var obj={};
-              obj.title=edits[key].title;
-              obj.pageid=edits[key].pageid;
-              obj.timestamp=edits[key].timestamp;
-              obj.revid=edits[key].revid;
-              data.push(obj);           
-            }
+          var ele=edits[key];
+          if (ele.type=="new" && data.length<postdata.updates && !ele.title.match(/^User|^Talk|Registration/i)){
+              data.push({
+                "title": ele.title,
+                "pageid": ele.pageid,
+                "timestamp": ele.timestamp,
+                "revid":ele.revid
+              }); 
           }
         }
         if(edits.length<maxmatches || data.length>=postdata.updates){          
@@ -164,8 +129,7 @@ function lastUpdatesTimeByDownload(req,res){
 }
 
 //Use transducers instead of for loops
-function seriesLanguageFilterByDownload(req,res){
-  var postdata=req.query;
+function seriesLanguageFilterByDownload(postdata,res){
   if(postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
     var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
@@ -221,9 +185,7 @@ function seriesLanguageFilterByDownload(req,res){
   }
 }
 
-function seriesTitleFilterByDownload(req,res){
-  var postdata=req.query;
-
+function seriesTitleFilterByDownload(postdata,res){
   // Continue only if series title is available.
   if(postdata.title){
     downloadJSONfromBakaTsukiMediaWiki("action=parse&prop=text&page="+postdata.title, function(jsondata){
@@ -269,29 +231,35 @@ function seriesTitleFilterByDownload(req,res){
 
         //Completed Preloading of Data
         //Get data about available volumes from the toc
+        var one_off=!$("#toc ul li").text().match(/volume/i)? true: false;
+        data.one_off=one_off ? true : false;
+        console.log(one_off);
         $("#toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
-          //console.log($(this).text());
-          if($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) && $(this).hasClass("toclevel-1")){       
+          if(($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) || 
+              (one_off && $(this).text().match(new RegExp(data.title, 'i')))) && 
+              $(this).hasClass("toclevel-1")) {       
             //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
             var volumesnames=volumelist.slice(1,volumelist.length);
             var seriesname=stripNumbering(volumelist[0]);
             var authorname=seriesname.split(/\sby\s/g);
+            
             if(authorname && authorname[1]){
               data.author=authorname[1];
             }       
             //Prepare nested JSON format for volume list for each series.  
             var seriesdata={};
             seriesdata.title= seriesname;
-            seriesdata.books=[];            
+            seriesdata.books=[];        
             for(var key in volumesnames){
               var volumedata={};
               volumedata.title=stripNumbering(volumesnames[key]);
               volumedata.chapters=[];
               seriesdata.books.push(volumedata);
             };
-            if(seriesdata.books.length>0){
+            if(seriesdata.books.length>0 || one_off){
+              //Problem with one-offs, they do not contain any volumes.
               data.sections.push(seriesdata);
             }
           }          
@@ -486,6 +454,9 @@ function seriesTitleFilterByDownload(req,res){
             data.sections[serieskey].books=tempvol;
           }
         }
+        if(one_off){
+          data.sections.map(function(ele){return ele.renameProperty("books","chapters");});
+        }        
         res.send(data); 
       }      
     });
@@ -493,6 +464,20 @@ function seriesTitleFilterByDownload(req,res){
 }
 
 //Utility functions
+function mergeObjects(obj1, obj2){
+  var finalobj={};
+  if(Object.keys(obj1).length>0 && Object.keys(obj2).length>0){
+    for(var key in obj1){
+      if(obj2[key]){
+        finalobj[key]=obj2[key];
+      }
+    }
+  }else if(Object.keys(obj1).length<=0 || Object.keys(obj2).length<=0){
+    finalobj = Object.keys(obj1).length>0 ? obj1 : obj2 ;
+  }
+  return finalobj;
+}
+
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -533,5 +518,23 @@ Object.defineProperty(Object.prototype, 'map', {
         return result;
     }
 });
+Object.defineProperty( Object.prototype, 'renameProperty', {
+        writable : false, // Cannot alter this property
+        enumerable : false, // Will not show up in a for-in loop.
+        configurable : false, // Cannot be deleted via the delete operator
+        value : function (oldName, newName) {
+            // Do nothing if the names are the same
+            if (oldName == newName) {
+                return this;
+            }
+            // Check for the old property name to 
+            // avoid a ReferenceError in strict mode.
+            if (this.hasOwnProperty(oldName)) {
+                this[newName] = this[oldName];
+                delete this[oldName];
+            }
+            return this;
+        }   }
+);
 
 module.exports = router;
