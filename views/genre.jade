@@ -1,7 +1,15 @@
 extends layout
 
 block content
-  h3 Genre Search
+  .toc
+    p Table of Contents
+    ul
+      li 
+        a(href="#GS") Genre Search
+      li 
+        a(href="#Example") JSON example
+
+  h3#GS Genre Search
   h5 route: "/api/genre"
   h5 return: JSON
   h5 format: /api/genre?list={list_of_genres}
@@ -24,69 +32,40 @@ block content
 
   h4 
     u JSON properties
+  .row#Example
+    .col-md-7
+      h5 genres
+      p (STRING) The list of genres that have been queried.
 
-  h5 genres
-  p (STRING) The list of genres that have been queried.
+      h5 titles
+      p (LIST) JSON data of the titles.
+      ul
+        li 
+          h5 title
+          p (STRING) title name of the book
+        li 
+          h5 page
+          p (STRING) interwiki main page title of the book.
+        li 
+          h5 lastreviseddate
+          p (STRING) The data and time of the last revision, in UTC+0.
+        li 
+          h5 lastrevisedid
+          p (NUMBER) the unique id of the last revison.
+        li 
+          h5 pageid
+          p (NUMBER) the unique id of the main page of the book
+    .col-md-5
+      h4 
+        | Example response using 
+      a(href="/api/genre?list=shoujo|comedy")
+      code /api/genre?list=shoujo|comedy
+      #json_display
 
-  h5 titles
-  p (LIST) JSON data of the titles.
-  ul
-    li 
-      h5 title
-      p (STRING) title name of the book
-    li 
-      h5 page
-      p (STRING) interwiki main page title of the book.
-    li 
-      h5 lastreviseddate
-      p (STRING) The data and time of the last revision, in UTC+0.
-    li 
-      h5 lastrevisedid
-      p (NUMBER) the unique id of the last revison.
-    li 
-      h5 pageid
-      p (NUMBER) the unique id of the main page of the book
 
-  br
-  h4 Example JSON 
-  a(href="/api/genre?list=shoujo|comedy")
-    code /api/genre?list=shoujo|comedy
-  br
-  .form-group
-    textarea.form-control(rows="95", disabled).
-      {
-        "genres": [
-          "shoujo",
-          "comedy"
-        ],
-        "titles": [
-          {
-            "page": "Ghost_Hunt",
-            "title": "Ghost Hunt",
-            "lastreviseddate": "2015-04-28T13:53:23Z",
-            "lastrevisedid": 439935,
-            "pageid": 2974
-          },
-          {
-            "page": "Maru-MA",
-            "title": "Maru-MA",
-            "lastreviseddate": "2015-04-29T20:12:28Z",
-            "lastrevisedid": 440287,
-            "pageid": 19977
-          },
-          {
-            "page": "Ojamajo_Doremi_16",
-            "title": "Ojamajo Doremi 16",
-            "lastreviseddate": "2015-04-29T13:23:20Z",
-            "lastrevisedid": 440175,
-            "pageid": 47518
-          },
-          {
-            "page": "Maru-MA_~_(Italian)",
-            "title": "Maru-MA ~ (Italian)",
-            "lastreviseddate": "2015-04-30T14:07:42Z",
-            "lastrevisedid": 440410,
-            "pageid": 74307
-          }
-        ]
-      }
+block scripts
+  script.
+    $(document).ready(function() {
+      $('#json_display').JSONView(data);
+    });
+    data={"genres":["shoujo","comedy"],"titles":{"2974":{"page":"Ghost_Hunt","title":"Ghost Hunt","lastreviseddate":"2015-09-18T00:36:56Z","pageid":2974}}};

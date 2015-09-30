@@ -62,86 +62,62 @@ block content
           code /api/time?titles=Zero_no_Tsukaima|Kino_no_Tabi&pageids=1912
         #json_display_1
     
+  #LUS
+    h3 Latest Update Search
+    h5 route: "/api/time"
+    h5 return: JSON
+    h5 format: /api/time?updates={number_of_newest_pages}[&from={starting_datetime}][&until={ending_datetime}]
+    br
+    h4 
+      u Filter Parameters
+    h5 By number of updates
+    a(href="/api/time?updates=20")
+      /api/time?updates=20
+    p 
+      | This must be a number. Extra characters are removed.
 
-  h3 Latest Update Search
-  h5 route: "/api/time"
-  h5 return: JSON
-  h5 format: /api/time?updates={number_of_newest_pages}[&from={starting_datetime}][&until={ending_datetime}]
-  br
-  h4 
-    u Filter Parameters
-  h5 By number of updates
-  a(href="/api/time?updates=20")
-    /api/time?updates=20
-  p 
-    | This must be a number. Extra characters are removed.
+    h5 By starting date and time (Optional)
+    a(href="/api/time?updates=20&from=2015-04-22T14:57:31Z")
+      /api/time?updates=20&from=2015-04-22T14:57:31Z
+    p 
+      | The date and time must be in the form of UTC+0, YYYY-MM-DDTHH:MM:SSZ. 
+      | This datetime marks the end of the search, as the server searches from the current datetime.
 
-  h5 By starting date and time (Optional)
-  a(href="/api/time?updates=20&from=2015-04-22T14:57:31Z")
-    /api/time?updates=20&from=2015-04-22T14:57:31Z
-  p 
-    | The date and time must be in the form of UTC+0, YYYY-MM-DDTHH:MM:SSZ
+    h5 By ending date and time (Optional)
+    a(href="/api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z")
+      /api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z
+    p 
+      | This must be used with the 
+      b from 
+      | parameter. If not, it will be ignored. The date and time must be in the form of UTC+0, YYYY-MM-DDTHH:MM:SSZ
 
-  h5 By ending date and time (Optional)
-  a(href="/api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z")
-    /api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z
-  p 
-    | This must be used with the 
-    b from 
-    | parameter. If not, it will be ignored. The date and time must be in the form of UTC+0, YYYY-MM-DDTHH:MM:SSZ
-
-  br
-  h4 
-    u JSON properties
-  p A list of JSON is returned as to preserve the order. 
-  h5 title
-  p (STRING) The title of the page.
-  h5 pageid
-  p (NUMBER) The pageid of the page.
-  h5 revid
-  p (NUMBER) The id of the page that is created.
-  h5 timestamp
-  p (STRING) The date and time of the creation of the page.
-  br
-  h5 Example JSON 
-  a(href="/api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z")
-    code /api/time?updates=20&from=2015-04-22T14:57:31Z&until=2015-04-22T20:58:55Z
-  br
-  .form-group
-    textarea.form-control(rows="31", disabled).
-      [
-        {
-          "title": "Toaru Majutsu no Index ~ Bahasa Indonesia:Jilid NT 11",
-          "pageid": 74069,
-          "timestamp": "2015-04-22T20:58:55Z",
-          "revid": 438952
-        },
-        {
-          "title": "Konjiki no Wordmaster:Web Chapter Extra",
-          "pageid": 74065,
-          "timestamp": "2015-04-22T17:09:38Z",
-          "revid": 438905
-        },
-        {
-          "title": "Seiken Tsukai No World Break:Volume 1 Chapter 5",
-          "pageid": 74063,
-          "timestamp": "2015-04-22T15:05:14Z",
-          "revid": 438872
-        },
-        {
-          "title": "MaruMA:DramaCD55:Track16",
-          "pageid": 74062,
-          "timestamp": "2015-04-22T14:57:31Z",
-          "revid": 438870
-        }
-      ]
+    br
+    h4#Example_LUS
+      u JSON properties
+    p A list of JSON is returned as to preserve the order. 
+    .row
+      .col-md-7
+        h5 title
+        p (STRING) The title of the page.
+        h5 pageid
+        p (NUMBER) The pageid of the page.
+        h5 revid
+        p (NUMBER) The id of the page that is created.
+        h5 timestamp
+        p (STRING) The date and time of the creation of the page.
+      .col-md-5
+        h4 
+          | Example response using 
+        a(href="/api/time?updates=5&from=2015-09-29T00:32:56Z&until=2015-09-30T08:42:23Z")
+          code /api/time?updates=5&from=2015-09-29T00:32:56Z&until=2015-09-30T08:42:23Z
+        #json_display_2
+    
 
 block scripts
   script.
     $(document).ready(function() {
       $('#json_display_1').JSONView(data_1);
-      $('#json_display_2').JSONView(data_2)
-      $('#json_display_3').JSONView(data_3);
+      $('#json_display_2').JSONView(data_2);
     });
-    data_1=[{"title":"Zero no Tsukaima","pageid":1838,"lastrevisedid":464468,"lastreviseddate":"2015-09-29T11:51:43Z"},{"title":"Kino no Tabi","pageid":4287,"lastrevisedid":462265,"lastreviseddate":"2015-09-16T23:29:19Z"},{"title":"Kino no Tabi","pageid":4287,"lastrevisedid":462265,"lastreviseddate":"2015-09-16T23:29:19Z"}];
-    data_3={"type":"Light_novel","language":"Arabic","titles":[{"page":"Suzumiya_haruhi_arabic-سوزوميا_هاروهي","title":"Suzumiya haruhi arabic-سوزوميا هاروهي","lastreviseddate":"2014-08-14T15:56:18Z","lastrevisedid":381727,"pageid":33699},{"page":"Sword_Art_Online_Arabic_Version","title":"Sword Art Online Arabic Version","lastreviseddate":"2014-08-05T07:56:44Z","lastrevisedid":378229,"pageid":40186}]};
+    data_1=[{"title":"Zero no Tsukaima","pageid":1838,"lastrevisedid":464468,"lastreviseddate":"2015-09-29T11:51:43Z"},{"title":"Kino no Tabi","pageid":4287,"lastrevisedid":462265,"lastreviseddate":"2015-09-16T23:29:19Z"},{"title":"Zero no Tsukaima:Volume1 Insert and Back Cover","pageid":1912,"lastrevisedid":218491,"lastreviseddate":"2013-01-08T21:29:25Z"}];
+    data_2=[{"title":"Tate no Yuusha no Nariagari (Spanish):Web Chapter 182","pageid":78956,"timestamp":"2015-09-30T08:42:23Z","revid":464592},{"title":"Том 4. Кровавый пир","pageid":78950,"timestamp":"2015-09-30T08:16:37Z","revid":464582},{"title":"Глава 1. Тот же усталый юноша","pageid":78949,"timestamp":"2015-09-30T08:14:02Z","revid":464579},{"title":"A Simple Survey (Indonesia):Jilid 1 Penutup","pageid":78948,"timestamp":"2015-09-30T02:15:45Z","revid":464561},{"title":"Magika No Kenshi To Shoukan Maou:Volume 5 Intermission","pageid":78947,"timestamp":"2015-09-29T22:26:24Z","revid":464542}];
