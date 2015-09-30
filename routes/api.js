@@ -233,7 +233,6 @@ function seriesTitleFilterByDownload(postdata,res){
         //Get data about available volumes from the toc
         var one_off=!$("#toc ul li").text().match(/volume/i)? true: false;
         data.one_off=one_off ? true : false;
-        console.log(one_off);
         $("#toc ul li").each(function(){          
           //Notes that each page format has its own quirks and the program attempts to match all of them
           if(($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) || 
