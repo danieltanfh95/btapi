@@ -13,19 +13,19 @@ function routeHandler(req,res,route_name,callback){
   }  
 }
 router.get('/',function(req,res){
-  routeHandler(req,res,"/series",seriesTitleFilterByDownload);
+  routeHandler(req,res,"/series.html",seriesTitleFilterByDownload);
 })
 
 router.get('/category',function(req,res){
-  routeHandler(req,res,"/category",seriesLanguageFilterByDownload);
+  routeHandler(req,res,"/category.html",seriesLanguageFilterByDownload);
 })
 
 router.get('/genre',function(req,res){
-  routeHandler(req,res,"/genre",seriesGenreFilterByDownload);
+  routeHandler(req,res,"/genre.html",seriesGenreFilterByDownload);
 })
 
 router.get('/time',function(req,res){
-  routeHandler(req,res,"/time",lastUpdatesTimeByDownload)
+  routeHandler(req,res,"/time.html",lastUpdatesTimeByDownload)
 })
 
 function seriesGenreFilterByDownload(postdata,res){
@@ -62,21 +62,29 @@ function lastUpdatesTimeByDownload(postdata,res){
   if(postdata.titles||postdata.pageids){
     downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&titles="+postdata.titles, function(titledata){
       downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&pageids="+postdata.pageids, function(pagedata){
-        res.send([titledata.query.normalized[0].from!="undefined" && !titledata.query.pages["-1"]?
-                  titledata.query.pages.map(function(ele){ return {
-                    "title": ele.title,
-                    "pageid": ele.pageid,
-                    "lastrevisedid": ele.lastrevid,
-                    "lastreviseddate": ele.revisions[0].timestamp
-                  };}) : null,
-                  !pagedata.query.pages[0] ?
-                  pagedata.query.pages.map(function(ele){ return {
-                    "title": ele.title,
-                    "pageid": ele.pageid,
-                    "lastrevisedid": ele.lastrevid,
-                    "lastreviseddate": ele.revisions[0].timestamp
-                  };}) : null ]
-                  .filter(function(ele){return ele!=null;}));
+        var data=[];
+        if(titledata.query.normalized[0].from!="undefined" && !titledata.query.pages["-1"]){
+          for(var ind in titledata.query.pages){
+            var ele=titledata.query.pages[ind];
+            data.push({
+              "title": ele.title,
+              "pageid": ele.pageid,
+              "lastrevisedid": ele.lastrevid,
+              "lastreviseddate": ele.revisions[0].timestamp
+            })
+          }
+        }
+        if(!pagedata.query.pages[0]){
+          for(var ind in pagedata.query.pages){
+            data.push({
+              "title": ele.title,
+              "pageid": ele.pageid,
+              "lastrevisedid": ele.lastrevid,
+              "lastreviseddate": ele.revisions[0].timestamp
+            })
+          }
+        }
+        res.send(data);
       });
     });
   }else if(postdata.updates){
@@ -446,7 +454,8 @@ function seriesTitleFilterByDownload(postdata,res){
             for(var volumekey in data.sections[serieskey].books){
               //Non number input will be removed
               var re1 = new RegExp("volume.?"+postdata.volumeno.match(/\d+/g)+"$", 'i');
-              if(data.sections[serieskey].books[volumekey].title.match(/\w+ ?\d+/gi)[0].match(re1) != null){
+              volume_match=data.sections[serieskey].books[volumekey].title.match(/\w+ ?\d+/ig);
+              if(volume_match && volume_match[0].match(re1)){
                 tempvol.push(data.sections[serieskey].books[volumekey]);
               }
             }
