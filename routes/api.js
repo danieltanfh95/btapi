@@ -13,19 +13,19 @@ function routeHandler(req,res,route_name,callback){
   }  
 }
 router.get('/',function(req,res){
-  routeHandler(req,res,"/series.html",seriesTitleFilterByDownload);
+  routeHandler(req,res,"/series",seriesTitleFilterByDownload);
 })
 
 router.get('/category',function(req,res){
-  routeHandler(req,res,"/category.html",seriesLanguageFilterByDownload);
+  routeHandler(req,res,"/category",seriesLanguageFilterByDownload);
 })
 
 router.get('/genre',function(req,res){
-  routeHandler(req,res,"/genre.html",seriesGenreFilterByDownload);
+  routeHandler(req,res,"/genre",seriesGenreFilterByDownload);
 })
 
 router.get('/time',function(req,res){
-  routeHandler(req,res,"/time.html",lastUpdatesTimeByDownload)
+  routeHandler(req,res,"/time",lastUpdatesTimeByDownload)
 })
 
 function seriesGenreFilterByDownload(postdata,res){
