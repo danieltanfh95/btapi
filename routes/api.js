@@ -76,6 +76,7 @@ function lastUpdatesTimeByDownload(postdata,res){
         }
         if(!pagedata.query.pages[0]){
           for(var ind in pagedata.query.pages){
+            var ele=pagedata.query.pages[ind];
             data.push({
               "title": ele.title,
               "pageid": ele.pageid,
