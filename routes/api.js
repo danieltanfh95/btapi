@@ -347,11 +347,12 @@ function seriesTitleFilterByDownload(postdata,res){
                 //Remove red links to pages that does not exist too.  
                 //Include external links          
                 if(!$(this).attr('href').match(/edit|Template/g)){
-                  var titletext=$(this).attr('title') ? $(this).attr('title') : $(this).parent().first().text();
+                  alternatetext = $(this).first().text().split(" ").length>1 ? $(this).first().text() : $(this).parent().first().text(); 
+                  var titletext=$(this).attr('title') ? $(this).attr('title') :alternatetext;
                   var chapterdata={};
                   chapterdata.title=titletext;
                   chapterdata.page=$(this).attr('href').replace(/\/project\/index.php\?title\=/g, "");
-                  var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";
+                  var linktype = $(this).attr('href').match(/^\/project/g)? "internal" : "external";                  
                   chapterdata.linktype=linktype;
                   if(linktype=="internal"){
                     chapterdata.link="https://www.baka-tsuki.org"+$(this).attr('href');
