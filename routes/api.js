@@ -245,10 +245,11 @@ function seriesTitleFilterByDownload(postdata,res){
         //Completed Preloading of Data
         //Get data about available volumes from the toc
         var one_off=!$("#toc ul li").text().match(/volume/i)? true: false;
-        data.one_off=one_off ? true : false;
-        $("#toc ul li").each(function(){          
+        data.one_off=one_off;
+        $("#toc ul li").each(function(){   
           //Notes that each page format has its own quirks and the program attempts to match all of them
-          if(($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) || 
+          if((($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) && 
+               !$(this).text().match(/miscellaneous notes/i)) || 
               (one_off && $(this).text().match(new RegExp(data.title, 'i')))) && 
               $(this).hasClass("toclevel-1")) {       
             //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
@@ -362,7 +363,7 @@ function seriesTitleFilterByDownload(postdata,res){
                   data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
                 }
               });
-
+              
               //Find the cover image in each volume section
               if(imageplacing==3){
                 var coverimg=walker.find("img");
@@ -415,6 +416,27 @@ function seriesTitleFilterByDownload(postdata,res){
                   data.sections[serieskey].books.push(chapterdata);
                 }              
               });
+            }
+
+            //Special Sugar_Dark Edge Case: Chapters in volume is categorised by other sections.
+            //This is only for cases where there is no obvioes order in chapters.
+            //I.e. multiple chapter 1's
+            //This code should be changed in favour of a depth-2 search for li elements, 
+            //but most novels isn't format that way.
+            if(data.title.match(/Sugar Dark/i)){
+              var holeid="";
+              var booklist=data.sections[serieskey].books;
+              for (var bookind in booklist){
+                for(var chapterind in booklist[bookind].chapters){
+                  var ele=booklist[bookind].chapters[chapterind].title;
+                  if(ele.match(/^hole/i) && holeid!=ele){
+                    holeid=ele;
+                  }
+                  if(ele.match(/chapter/i)){
+                    data.sections[serieskey].books[bookind].chapters[chapterind].title=holeid+":"+ele;
+                  }                  
+                }
+              }
             }
           }
         }
@@ -507,6 +529,12 @@ function stripNumbering(line){
   line=line.replace(/^\s+|\s+$/g, '').split(/ /g);
   return line.slice(1,line.length).join(" ");
 }
+function arrayUnique (a) {
+    return a.reduce(function(p, c) {
+        if (p.indexOf(c) < 0) p.push(c);
+        return p;
+    }, []);
+};
 
 function downloadJSONfromBakaTsukiMediaWiki(url_params, callback) {
   https.get(encodeURI("https://www.baka-tsuki.org/project/api.php?format=json&"+url_params), function(res) {
