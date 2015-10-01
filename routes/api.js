@@ -37,6 +37,12 @@ function pageDownload(postdata,res){
     downloadJSONfromBakaTsukiMediaWiki("action=parse&prop=text&page="+postdata.title,function(jsondata){
       if(jsondata.parse && jsondata.parse.text){ 
         var $=cheerio.load(jsondata.parse.text["*"]);
+        $("a").each(function(){
+          var ele=$(this).attr('href');
+          if(ele.match(/^\/project/)){
+            $(this).attr('href',"https://www.baka-tsuki.org"+ele);
+          }
+        })
         $("img").each(function(){
           var ele=$(this).attr('src');
           if(ele.match(/^\/project/)){
