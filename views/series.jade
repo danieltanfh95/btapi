@@ -10,9 +10,9 @@ block content
         a(href="#Example") JSON example
   .wrapper
     h3#LNS Light Novel Search
-    route: "/api"
-    return: JSON
-    format: /api?title={light_novel_title}[&series={regex_of_series_name}][&volume={regex_of_volume_name}][&volumeno={volume_number}]
+    h5 route: GET "/api"
+    h5 return: JSON
+    h5 format: /api?title={light_novel_title}[&series={regex_of_series_name}][&volume={regex_of_volume_name}][&volumeno={volume_number}]
     br
     h4 
       u Filter Parameters
