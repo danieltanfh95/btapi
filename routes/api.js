@@ -17,7 +17,7 @@ router.get('/',function(req,res){
 })
 
 router.get('/category',function(req,res){
-  routeHandler(req,res,"/category.html",seriesLanguageFilterByDownload);
+  routeHandler(req,res,"/category.html",seriesCategoryFilterByDownload);
 })
 
 router.get('/genre',function(req,res){
@@ -30,21 +30,23 @@ router.get('/time',function(req,res){
 
 function seriesGenreFilterByDownload(postdata,res){
   //var postdata=req.query;
-  if(postdata.list){    
+  if(postdata.list){ 
+    var postlist=postdata.list.split("|").map(function(ele){return capitalizeFirstLetter(ele.replace(/Genre[\s_]?-[\s_]?/i,""));});
     function getAllGenres(genreList,tempdata){
+      if(!tempdata) tempdata = {};
       var url = "action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:Genre_-_";
       if(genreList.length>0){
-        url+=capitalizeFirstLetter(genreList.pop());
+        url+=last(genreList);
         downloadJSONfromBakaTsukiMediaWiki(url,function(jsondata){
           if(jsondata.query && jsondata.query.pages){
             tempdata=mergeObjects(tempdata,jsondata.query.pages);
           }
-          getAllGenres(genreList,tempdata);
+          getAllGenres(popb(genreList),tempdata);
         })
       }else{
         //Reorganise the data
         res.send({
-              "genres":postdata.list.split("|"),
+              "genres":postlist,
               "titles":tempdata.map(function(ele){return {
                 "page":ele.title.replace(/ /g,"_"),
                 "title":ele.title,
@@ -54,7 +56,8 @@ function seriesGenreFilterByDownload(postdata,res){
               };})});
       }      
     }
-    getAllGenres(postdata.list.split("|"),{});
+    //javascript requires this to ensure it is copied not changed
+    getAllGenres(postlist);
   }
 }
 
@@ -138,7 +141,7 @@ function lastUpdatesTimeByDownload(postdata,res){
 }
 
 //Use transducers instead of for loops
-function seriesLanguageFilterByDownload(postdata,res){
+function seriesCategoryFilterByDownload(postdata,res){
   if(postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
     var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
@@ -194,6 +197,18 @@ function seriesLanguageFilterByDownload(postdata,res){
                     "title": ele.title
                   };})
       });
+    })
+  }else if(postdata.title){
+    //Get all categories in this titles.
+    console.log(postdata.title);
+    downloadJSONfromBakaTsukiMediaWiki("action=query&generator=categories&titles="+postdata.title,function(jsondata){
+      data=[];
+      var pages= jsondata.query.pages;
+      for (var key in pages) {
+        var category = pages[key].title.replace(/Category:/g,"");
+        data.push(category);
+      };
+      res.send(data);
     })
   }
 }
@@ -518,6 +533,10 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function last(arr){
+  return arr[arr.length-1];
+}
+
 function rest(arr){
   return arr.slice(1, arr.length);
 }
@@ -545,7 +564,8 @@ function downloadJSONfromBakaTsukiMediaWiki(url_params, callback) {
     res.on("end", function() {
       callback(JSON.parse(data));
     });
-  }).on("error", function() {
+  }).on("error", function(err) {
+    console.log(err);
     callback(null);
   });
 }

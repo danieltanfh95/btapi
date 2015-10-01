@@ -12,6 +12,11 @@ block content
         a(href="#Example_Language") JSON example for language parameter only
       li
         a(href="#Example_Both") JSON example for type and langauge parameter
+      li 
+        a(href="#TS") Tags Search
+      li
+        a(href="#Example_TS") JSON example for tags search
+
 
   #TLS
     h3 Type and Language Search
@@ -128,13 +133,46 @@ block content
           code /api/category?type=LIGHT_NOVEL&language=ARABIC
         #json_display_3
 
+  #TS
+    h3 Tags Search
+    h5 route: GET "/api/category"
+    h5 return: JSON
+    h5 format: /api/category?titles={titles1}
+    br
+    h4 
+      u Filter Parameters
+
+    h5 By title (Optional)
+    a(href="/api/category?title=Zero_no_Tsukaima")
+      /api/category?title=Zero_no_Tsukaima
+    p 
+      | This will return a list of categories that the title has been tagged with.
+
+    br
+
+    h4 
+      u JSON properties
+
+    .row#Example_TS
+      .col-md-7
+        p (LIST) List of tags available for that particular title
+      .col-md-5
+        h4 
+          | Example response using 
+        a(href="/api/category?title=Zero_no_Tsukaima")
+          code /api/category?title=Zero_no_Tsukaima
+        #json_display_4
+
+
 block scripts
   script.
     $(document).ready(function() {
       $('#json_display_1').JSONView(data_1).JSONView('toggle',1);
-      $('#json_display_2').JSONView(data_2)
+      $('#json_display_2').JSONView(data_2);
       $('#json_display_3').JSONView(data_3);
+      $('#json_display_4').JSONView(data_4);
     });
     data_1={"types":"Light_novel","language":["Arabic","Brazilian Portuguese","Bulgarian","Croatian","Czech","Dutch","English","Esperanto","Filipino","French","German","Greek","Hungarian","Indonesian","Italian","Korean","Lithuanian","Macedonian","Myanmar","Norwegian","Polish","Romanian","Russian","Spanish","Swedish","Turkish","Vietnamese"]};
     data_2={"language":"English","types":["Light_novel","Teaser","Web_novel"]};
     data_3={"type":"Light_novel","language":"Arabic","titles":[{"page":"Suzumiya_haruhi_arabic-سوزوميا_هاروهي","title":"Suzumiya haruhi arabic-سوزوميا هاروهي","lastreviseddate":"2014-08-14T15:56:18Z","lastrevisedid":381727,"pageid":33699},{"page":"Sword_Art_Online_Arabic_Version","title":"Sword Art Online Arabic Version","lastreviseddate":"2014-08-05T07:56:44Z","lastrevisedid":378229,"pageid":40186}]};
+    data_4=["MF Bunko J","Genre - Harem","Genre - Action","Light novel (English)","Noboru Yamaguchi","Genre - Fantasy","Active Projects","Genre - Ecchi","Genre - Romance","Genre - Comedy"];

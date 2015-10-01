@@ -27,7 +27,8 @@ html
                 i.fa.fa-commenting.fa-2x 
           ul.nav.navbar-nav.navbar-right
             li
-              a(href='#') Top
+              a(href='#top') Top
+    #top
     block content
     script(src='javascripts/jquery-2.1.1.js')
     script(src='javascripts/bootstrap.min.js')
@@ -35,5 +36,18 @@ html
     script.
       $(document).ready(function () {
         $("[data-toggle='tooltip']").tooltip();
+        $('a[href*=#]:not([href=#])').click(function() {
+          if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') 
+              && location.hostname == this.hostname) {
+            var target = $(this.hash);
+            target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+            if (target.length) {
+              $('html,body').animate({
+                scrollTop: target.offset().top-60
+              }, 800);
+              return false;
+            }
+          }
+        });
       });
     block scripts
