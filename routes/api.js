@@ -36,9 +36,9 @@ function pageDownload(postdata,res){
   if(postdata.title){
     downloadHTMLfromBakaTsuki(postdata.title,function(jsondata){
       if(jsondata){ 
-        var $=cheerio.load(jsondata);
-        var content=$("#content").html();
-        $("html").html(content);
+        var $=cheerio.load(jsondata);        
+        //var content=$("#content").html();
+        //$("body").html(content);
         $("a").each(function(){
           var ele=$(this).attr('href');
           if(ele && ele.match(/^\/project/)){
@@ -292,11 +292,11 @@ function seriesTitleFilterByDownload(postdata,res){
       if(jsondata){
         var $=cheerio.load(jsondata)
         var content=$("#content").html();
-        $("html").html(content);
+        $("body").html(content);
         //Preload the data for the light novel
         data.title=postdata.title;
         data.sections=[];
-        var status= $(":contains('Project')").text().match(/HALTED|IDLE|ABANDONED|WARNING/i);
+        var status= $("div:contains('Project')").text().match(/HALTED|IDLE|ABANDONED|WARNING/i);
         data.status=status ? status[0].toLowerCase() : "active";
         data.author="";
         data.synopsis="";
@@ -313,6 +313,8 @@ function seriesTitleFilterByDownload(postdata,res){
         if(data.categories.indexOf("Completed Project")>=0){
           data.status="completed";
         }
+
+        //$("table:contains(Project)").html("");
         
         var synopsiswalk = $(":header").filter(function(){
           return $(this).text().match(/synopsis/i)!=null;
@@ -420,7 +422,8 @@ function seriesTitleFilterByDownload(postdata,res){
             for(var volumekey in data.sections[serieskey].books){
               //First search for links in the heading.
               //This includes full text page versions.
-              var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title+"')").first();
+              var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title.match(/[A-Za-z\d\s]/i)+"')").first();
+              console.log(heading.html());
               var headinglinks=heading.find('a');
               headinglinks.each(function(){
                 //Reject links to edit the page or template and resource links.
