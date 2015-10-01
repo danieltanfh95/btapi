@@ -285,12 +285,13 @@ function seriesCategoryFilterByDownload(postdata,res){
 function seriesTitleFilterByDownload(postdata,res){
   // Continue only if series title is available.
   if(postdata.title){
-    downloadJSONfromBakaTsukiMediaWiki("action=parse&prop=text&page="+postdata.title, function(jsondata){
+    downloadHTMLfromBakaTsuki(postdata.title, function(jsondata){
       var data={};   
-      if(jsondata.parse && jsondata.parse.text){
-        var $=cheerio.load(jsondata.parse.text["*"]);
+      if(jsondata){
+        var $=cheerio.load(jsondata)
+        $.html($("#content"));
         //Preload the data for the light novel
-        data.title=jsondata.parse.title;
+        data.title=postdata.title;
         data.sections=[];
         var status= $(":contains('Project')").text().match(/HALTED|IDLE|ABANDONED|WARNING/i);
         data.status=status ? status[0].toLowerCase() : "active";
@@ -634,6 +635,21 @@ function downloadJSONfromBakaTsukiMediaWiki(url_params, callback) {
     });
     res.on("end", function() {
       callback(JSON.parse(data));
+    });
+  }).on("error", function(err) {
+    console.log(err);
+    callback(null);
+  });
+}
+
+function downloadHTMLfromBakaTsuki(url_params, callback) {
+  https.get(encodeURI("https://www.baka-tsuki.org/project/index.php?title="+url_params), function(res) {
+    var data = "";
+    res.on('data', function (chunk) {
+      data += chunk;
+    });
+    res.on("end", function() {
+      callback(data);
     });
   }).on("error", function(err) {
     console.log(err);
