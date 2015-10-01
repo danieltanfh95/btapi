@@ -34,18 +34,20 @@ router.get('/page',function(req,res){
 
 function pageDownload(postdata,res){
   if(postdata.title){
-    downloadJSONfromBakaTsukiMediaWiki("action=parse&prop=text&page="+postdata.title,function(jsondata){
-      if(jsondata.parse && jsondata.parse.text){ 
-        var $=cheerio.load(jsondata.parse.text["*"]);
+    downloadHTMLfromBakaTsuki(postdata.title,function(jsondata){
+      if(jsondata){ 
+        var $=cheerio.load(jsondata);
+        var content=$("#content").html();
+        $("html").html(content);
         $("a").each(function(){
           var ele=$(this).attr('href');
-          if(ele.match(/^\/project/)){
+          if(ele && ele.match(/^\/project/)){
             $(this).attr('href',"https://www.baka-tsuki.org"+ele);
           }
         })
         $("img").each(function(){
           var ele=$(this).attr('src');
-          if(ele.match(/^\/project/)){
+          if(ele && ele.match(/^\/project/)){
             $(this).attr('src',"https://www.baka-tsuki.org"+ele);
           }
         })
@@ -289,7 +291,8 @@ function seriesTitleFilterByDownload(postdata,res){
       var data={};   
       if(jsondata){
         var $=cheerio.load(jsondata)
-        $.html($("#content"));
+        var content=$("#content").html();
+        $("html").html(content);
         //Preload the data for the light novel
         data.title=postdata.title;
         data.sections=[];
@@ -637,7 +640,7 @@ function downloadJSONfromBakaTsukiMediaWiki(url_params, callback) {
       callback(JSON.parse(data));
     });
   }).on("error", function(err) {
-    console.log(err);
+    //console.log(err);
     callback(null);
   });
 }
