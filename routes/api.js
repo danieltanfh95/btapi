@@ -148,7 +148,7 @@ function lastUpdatesTimeByDownload(postdata,res){
 //Use transducers instead of for loops
 function seriesCategoryFilterByDownload(postdata,res){
   //console.log(postlist.list, postdata.genres);
-  if(!postdata.list && !postdata.genres && postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
+  if(!postdata.title && !postdata.list && !postdata.genres && postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
     var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     var category =titletype+"_("+language+")";
