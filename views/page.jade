@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  #toc
+    p Table of Contents
+    ul
+      li 
+        a(href="#GS") Page Download
+
+  h3#GS 
+    | Page Download
+  h5 route: GET "/api/page"
+  h5 return: JSON 
+  h5 format: /api/page?title={list_of_genres}
+  br
+  h4 
+    u Filter Parameters
+
+  h5 By list
+  a(href="/api/page?title=Zero_No_Tsukaima")
+    /api/page?title=Zero_No_Tsukaima
+  p 
+    | This parameter 
+    b must be present 
+    | to continue. 
+
+  br
+
+  h4 
+    u JSON properties
+  p (STRING) HTML of the page.
