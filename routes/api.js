@@ -153,21 +153,16 @@ function seriesCategoryFilterByDownload(postdata,res){
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     var category =titletype+"_("+language+")";
     downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:"+category, function(jsondata){
-      var data=[];
-      for(var ind in jsondata.query.pages){
-        var ele = jsondata.query.pages[ind];
-        data.push({
+      res.send({
+        "type": titletype,
+        "language": language,
+        "titles": jsondata.query.pages.map(function(ele){return {
           "page":ele.title.replace(/ /g,"_"),
           "title":ele.title,
           "lastreviseddate": ele.revisions[0].timestamp,
           "lastrevisedid": ele.lastrevid,
           "pageid": ele.pageid
-        });
-      }
-      res.send({
-        "type": titletype,
-        "language": language,
-        "titles": data
+        };})
       });
     })    
   }else if(postdata.language && !postdata.type){
@@ -208,13 +203,7 @@ function seriesCategoryFilterByDownload(postdata,res){
     //Get all categories in this titles.
     console.log(postdata.title);
     downloadJSONfromBakaTsukiMediaWiki("action=query&generator=categories&titles="+postdata.title,function(jsondata){
-      data=[];
-      var pages= jsondata.query.pages;
-      for (var key in pages) {
-        var category = pages[key].title.replace(/Category:/g,"");
-        data.push(category);
-      };
-      res.send(data);
+      res.send(jsondata.query.pages.map(function(ele){return ele.title.replace(/Category:/g,"");}));
     })
   }else{
     //Main bulk of the category search
@@ -250,20 +239,15 @@ function seriesCategoryFilterByDownload(postdata,res){
         })
       }else{
         //Reorganise the data
-        var data=[];
-        for(var key in tempdata){
-          var ele = tempdata[key];
-          data.push({
-            "page":ele.title.replace(/ /g,"_"),
-            "title":ele.title,
-            "lastreviseddate":ele.revisions[0].timestamp,
-            "lastrevisedid": ele.lastrevisedid,
-            "pageid":ele.pageid
-          });
-        }
         res.send({
               "tags":postlist,
-              "titles":data});
+              "titles":tempdata.map(function(ele){return{
+                "page":ele.title.replace(/ /g,"_"),
+                "title":ele.title,
+                "lastreviseddate":ele.revisions[0].timestamp,
+                "lastrevisedid": ele.lastrevisedid,
+                "pageid":ele.pageid
+              };})});
       }      
     }
     //javascript requires this to ensure it is copied not changed
@@ -633,9 +617,9 @@ function downloadJSONfromBakaTsukiMediaWiki(url_params, callback) {
 Object.defineProperty(Object.prototype, 'map', {
     value: function(f, ctx) {
         ctx = ctx || this;
-        var self = this, result = {};
+        var self = this, result = [];
         Object.keys(self).forEach(function(k) {
-            result[k] = f.call(ctx, self[k], k, self); 
+            result.push(f.call(ctx, self[k], k, self)); 
         });
         return result;
     }
