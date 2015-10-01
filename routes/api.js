@@ -262,7 +262,7 @@ function seriesCategoryFilterByDownload(postdata,res){
           });
         }
         res.send({
-              "genres":postlist,
+              "tags":postlist,
               "titles":data});
       }      
     }
