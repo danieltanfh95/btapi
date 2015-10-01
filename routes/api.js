@@ -147,7 +147,8 @@ function lastUpdatesTimeByDownload(postdata,res){
 
 //Use transducers instead of for loops
 function seriesCategoryFilterByDownload(postdata,res){
-  if(!postdata.list && postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
+  //console.log(postlist.list, postdata.genres);
+  if(!postdata.list && !postdata.genres && postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
     var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     var category =titletype+"_("+language+")";
@@ -215,9 +216,12 @@ function seriesCategoryFilterByDownload(postdata,res){
       };
       res.send(data);
     })
-  }else if(postdata.list){
+  }else{
     //Main bulk of the category search
-    var postlist=postdata.list.split("|");
+    postlist=[];
+    if (postdata.list){
+        var postlist=postdata.list.split("|");
+    }
     if(postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
       var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
       var language =capitalizeFirstLetter(postdata.language.toLowerCase());
