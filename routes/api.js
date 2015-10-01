@@ -236,6 +236,7 @@ function seriesCategoryFilterByDownload(postdata,res){
     })
   }else{
     //Main bulk of the category search
+    console.log(postdata);
     postlist=[];
     if (postdata.list){
         var postlist=postdata.list.split("|");
@@ -244,7 +245,7 @@ function seriesCategoryFilterByDownload(postdata,res){
       var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
       var language =capitalizeFirstLetter(postdata.language.toLowerCase());
       postlist.push(titletype+"_("+language+")");
-    }else if(postdata.type.match(/Original_?novel/i)){
+    }else if(postdata.type && postdata.type.match(/Original_?novel/i)){
       postlist.push("Original_novel");
     }
     if(postdata.genres){
