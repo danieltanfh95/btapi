@@ -28,6 +28,27 @@ router.get('/time',function(req,res){
   routeHandler(req,res,"/time.html",lastUpdatesTimeByDownload)
 })
 
+router.get('/page',function(req,res){
+  routeHandler(req,res,"/page.html",pageDownload)
+})
+
+function pageDownload(postdata,res){
+  if(postdata.title){
+    downloadJSONfromBakaTsukiMediaWiki("action=parse&prop=text&page="+postdata.title,function(jsondata){
+      if(jsondata.parse && jsondata.parse.text){ 
+        var $=cheerio.load(jsondata.parse.text["*"]);
+        $("img").each(function(){
+          var ele=$(this).attr('src');
+          if(ele.match(/^\/project/)){
+            $(this).attr('src',"https://www.baka-tsuki.org"+ele);
+          }
+        })
+        res.send($.html());
+      }
+    });
+  }
+}
+
 function seriesGenreFilterByDownload(postdata,res){
   //var postdata=req.query;
   if(postdata.list){ 

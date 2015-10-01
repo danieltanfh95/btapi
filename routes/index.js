@@ -22,6 +22,10 @@ router.get('/genre', function(req, res) {
   res.render('genre.html');
 });
 
+router.get('/page', function(req, res) {
+  res.render('page.html');
+});
+
 router.get('/reader', function(req, res) {
   res.render('webindex.html');
 });
