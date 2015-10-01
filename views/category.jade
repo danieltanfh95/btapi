@@ -11,11 +11,13 @@ block content
       li
         a(href="#Example_Language") JSON example for language parameter only
       li
-        a(href="#Example_Both") JSON example for type and langauge parameter
+        a(href="#Example_Both") JSON example for type and language parameter
       li 
         a(href="#TS") Tags Search
       li
-        a(href="#Example_TS") JSON example for tags search
+        a(href="#Example_TS") JSON example for title parameter
+      li
+        a(href="#Example_LP") JSON example for list parameter
 
 
   #TLS
@@ -137,12 +139,12 @@ block content
     h3 Tags Search
     h5 route: GET "/api/category"
     h5 return: JSON
-    h5 format: /api/category?titles={titles1}
+    h5 format: /api/category?[titles={title}][list={tag1|tag2}[&genres={genre1|genre2|...}][&type={book_type}&language={language}]]
     br
     h4 
       u Filter Parameters
 
-    h5 By title (Optional)
+    h5#Example_TS By title (Optional)
     a(href="/api/category?title=Zero_no_Tsukaima")
       /api/category?title=Zero_no_Tsukaima
     p 
@@ -153,7 +155,7 @@ block content
     h4 
       u JSON properties
 
-    .row#Example_TS
+    .row
       .col-md-7
         p (LIST) List of tags available for that particular title
       .col-md-5
@@ -163,6 +165,53 @@ block content
           code /api/category?title=Zero_no_Tsukaima
         #json_display_4
 
+    br
+
+    h5#Example_LP By tags (Optional)
+    a(href="/api/category?list=MF Bunko J&genres=harem")
+      /api/category?list=MF Bunko J&genres=harem
+    p 
+      | This will return a list of JSON of books with the tags.
+    p 
+      |You can use this with type and language search. However, note that you must specify both. or it will fail unless the type is 
+      b Original_novel.
+    p You can also use this with genre search.
+
+    br
+
+    h4 
+      u JSON properties
+
+    .row
+      .col-md-7
+        h5 genres
+        p (STRING) The list of categories that have been queried.
+
+        h5 titles
+        p (LIST) JSON data of the titles.
+        ul
+          li 
+            h5 title
+            p (STRING) title name of the book
+          li 
+            h5 page
+            p (STRING) interwiki main page title of the book.
+          li 
+            h5 lastreviseddate
+            p (STRING) The data and time of the last revision, in UTC+0.
+          li 
+            h5 lastrevisedid
+            p (NUMBER) the unique id of the last revison.
+          li 
+            h5 pageid
+            p (NUMBER) the unique id of the main page of the book
+      .col-md-5
+        h4 
+          | Example response using 
+        a(href="/api/category?list=MF Bunko J&genres=comedy|harem&type=Light Novel&language=english")
+          code /api/category?list=MF Bunko J&genres=comedy|harem&type=Light Novel&language=english
+        #json_display_5
+
 
 block scripts
   script.
@@ -171,8 +220,10 @@ block scripts
       $('#json_display_2').JSONView(data_2);
       $('#json_display_3').JSONView(data_3);
       $('#json_display_4').JSONView(data_4);
+      $('#json_display_5').JSONView(data_5);
     });
     data_1={"types":"Light_novel","language":["Arabic","Brazilian Portuguese","Bulgarian","Croatian","Czech","Dutch","English","Esperanto","Filipino","French","German","Greek","Hungarian","Indonesian","Italian","Korean","Lithuanian","Macedonian","Myanmar","Norwegian","Polish","Romanian","Russian","Spanish","Swedish","Turkish","Vietnamese"]};
     data_2={"language":"English","types":["Light_novel","Teaser","Web_novel"]};
     data_3={"type":"Light_novel","language":"Arabic","titles":[{"page":"Suzumiya_haruhi_arabic-سوزوميا_هاروهي","title":"Suzumiya haruhi arabic-سوزوميا هاروهي","lastreviseddate":"2014-08-14T15:56:18Z","lastrevisedid":381727,"pageid":33699},{"page":"Sword_Art_Online_Arabic_Version","title":"Sword Art Online Arabic Version","lastreviseddate":"2014-08-05T07:56:44Z","lastrevisedid":378229,"pageid":40186}]};
     data_4=["MF Bunko J","Genre - Harem","Genre - Action","Light novel (English)","Noboru Yamaguchi","Genre - Fantasy","Active Projects","Genre - Ecchi","Genre - Romance","Genre - Comedy"];
+    data_5={"genres":["MF Bunko J","Light novel_(English)","Genre_-_Comedy","Genre_-_Harem"],"titles":[{"page":"Zero_no_Tsukaima","title":"Zero no Tsukaima","lastreviseddate":"2015-09-29T11:51:43Z","pageid":1838},{"page":"Seikoku_no_Ryuu_Kishi","title":"Seikoku no Ryuu Kishi","lastreviseddate":"2015-09-29T05:39:43Z","pageid":27874},{"page":"Tsuki_Tsuki!","title":"Tsuki Tsuki!","lastreviseddate":"2015-07-15T19:30:20Z","pageid":28999},{"page":"Mayo_Chiki!","title":"Mayo Chiki!","lastreviseddate":"2015-04-28T18:32:46Z","pageid":39271},{"page":"Kenshin_no_Keishousha","title":"Kenshin no Keishousha","lastreviseddate":"2015-06-25T22:09:04Z","pageid":39739},{"page":"Onii-chan_Dakedo_Ai_Sae_Areba_Kankei_Nai_yo_ne—","title":"Onii-chan Dakedo Ai Sae Areba Kankei Nai yo ne—","lastreviseddate":"2015-07-24T15:33:25Z","pageid":43684}]};

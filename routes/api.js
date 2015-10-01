@@ -45,16 +45,21 @@ function seriesGenreFilterByDownload(postdata,res){
         })
       }else{
         //Reorganise the data
+        var data=[];
+        for(var key in tempdata){
+          var ele = tempdata[key];
+          data.push({
+            "page":ele.title.replace(/ /g,"_"),
+            "title":ele.title,
+            "lastreviseddate":ele.revisions[0].timestamp,
+            "lastrevisedid": ele.lastrevisedid,
+            "pageid":ele.pageid
+          });
+        }
         res.send({
               "genres":postlist,
-              "titles":tempdata.map(function(ele){return {
-                "page":ele.title.replace(/ /g,"_"),
-                "title":ele.title,
-                "lastreviseddate":ele.revisions[0].timestamp,
-                "lastrevisedid": ele.lastrevisedid,
-                "pageid":ele.pageid
-              };})});
-      }      
+              "titles":data});
+      }       
     }
     //javascript requires this to ensure it is copied not changed
     getAllGenres(postlist);
@@ -142,7 +147,7 @@ function lastUpdatesTimeByDownload(postdata,res){
 
 //Use transducers instead of for loops
 function seriesCategoryFilterByDownload(postdata,res){
-  if(postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
+  if(!postdata.list && postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
     var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     var category =titletype+"_("+language+")";
@@ -210,6 +215,55 @@ function seriesCategoryFilterByDownload(postdata,res){
       };
       res.send(data);
     })
+  }else if(postdata.list){
+    //Main bulk of the category search
+    var postlist=postdata.list.split("|");
+    if(postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
+      var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
+      var language =capitalizeFirstLetter(postdata.language.toLowerCase());
+      postlist.push(titletype+"_("+language+")");
+    }else if(postdata.type.match(/Original_?novel/i)){
+      postlist.push("Original_novel");
+    }
+    if(postdata.genres){
+      var genresList=postdata.genres.split("|");
+      for(var ind in genresList){
+        var ele=genresList[ind];
+        if(!ele.match(/Genre[\s_]?-[\s_]?/i)) ele="Genre_-_"+capitalizeFirstLetter(ele);
+        postlist.push(ele);
+      }
+    }
+    function getAllGenres(genreList,tempdata){
+      if(!tempdata) tempdata = {};
+      var url = "action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:";
+      if(genreList.length>0){
+        url+=last(genreList);
+        downloadJSONfromBakaTsukiMediaWiki(url,function(jsondata){
+          if(jsondata.query && jsondata.query.pages){
+            tempdata=mergeObjects(tempdata,jsondata.query.pages);
+          }
+          getAllGenres(popb(genreList),tempdata);
+        })
+      }else{
+        //Reorganise the data
+        var data=[];
+        for(var key in tempdata){
+          var ele = tempdata[key];
+          data.push({
+            "page":ele.title.replace(/ /g,"_"),
+            "title":ele.title,
+            "lastreviseddate":ele.revisions[0].timestamp,
+            "lastrevisedid": ele.lastrevisedid,
+            "pageid":ele.pageid
+          });
+        }
+        res.send({
+              "genres":postlist,
+              "titles":data});
+      }      
+    }
+    //javascript requires this to ensure it is copied not changed
+    getAllGenres(postlist);
   }
 }
 
@@ -518,12 +572,14 @@ function seriesTitleFilterByDownload(postdata,res){
 function mergeObjects(obj1, obj2){
   var finalobj={};
   if(Object.keys(obj1).length>0 && Object.keys(obj2).length>0){
+    //use anyone object can compare if they have the same key.
     for(var key in obj1){
       if(obj2[key]){
         finalobj[key]=obj2[key];
       }
     }
   }else if(Object.keys(obj1).length<=0 || Object.keys(obj2).length<=0){
+    console.log("Error");
     finalobj = Object.keys(obj1).length>0 ? obj1 : obj2 ;
   }
   return finalobj;
