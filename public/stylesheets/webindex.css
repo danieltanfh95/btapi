@@ -16,3 +16,10 @@
 #novels{
   padding-bottom: 40px;
 }
+.pane{
+  margin-bottom: 10px;
+}
+.pane-img img{
+  max-width: 100%;
+  height: 300px;
+}

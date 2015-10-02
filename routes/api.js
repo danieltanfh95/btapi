@@ -367,7 +367,7 @@ function seriesTitleFilterByDownload(postdata,res){
           //Notes that each page format has its own quirks and the program attempts to match all of them
           if((($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) && 
                !$(this).text().match(/miscellaneous notes/i)) || 
-              (one_off && $(this).text().match(new RegExp(data.title.replace("_"," "), 'i')))) && 
+              (one_off && $(this).text().match(new RegExp(data.title.replace("_"," "), 'gi')))) && 
               $(this).hasClass("toclevel-1")) {       
             //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
@@ -417,7 +417,7 @@ function seriesTitleFilterByDownload(postdata,res){
         
         if(data.sections.length>0){
           //Determine the type of overall image placing
-          var firstbook=one_off ? data.title.replace("_"," ") : data.sections[0].books[0]
+          var firstbook=one_off ? data.title.replace(/_/g," ") : data.sections[0].books[0]
           if(firstbook){
             var volheading=$(":header:contains('"+firstbook.title+"')").first();
             var coverimage=volheading.prevUntil($(":header")).find("img");

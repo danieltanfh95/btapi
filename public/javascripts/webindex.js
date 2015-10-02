@@ -31,7 +31,7 @@ function preparegenrebuttons(){
         $.get("/api/category?genres="+html,function(data){
           var html="";
           html=data.titles.map(function(ele){
-            return '<a href="https://baka-tsuki.org/project/index.php?title='+ele.page+'"><div class="col-md-6 pane">'+ele.title+'</div></a>';
+            return '<a href="https://baka-tsuki.org/project/index.php?title='+ele.page+'"><div class="col-md-4 pane"><div class="pane-img" id='+ele.page.replace(/[\!\/\\]/g,"_")+'><i class="fa fa-circle-o-notch fa-spin"></i></div>'+ele.title+'</div></a>';
           });
           //data is json data.
           if(html==""){
@@ -40,16 +40,18 @@ function preparegenrebuttons(){
           $("#novels").html(html);
           $(".card.loading").addClass("hide");
           $(".card.success").removeClass("hide").click(function(){$(this).addClass("hide");});
-          function getCoverImages(titlelist,tempdata){
-            if(tempdata==undefined) tempdata={};
+          function getCoverImages(titlelist){
+            //This hack is because the free account on Heroku can't really handle that many concurrent requests
             if(titlelist.length>0){             
               $.get("/api?title="+titlelist[0],function(json){
                 console.log(json.cover);
-                tempdata[titlelist[0]]=titlelist[0];
-                getCoverImages(rest(titlelist),tempdata);
+                if(json.cover){
+                  $("#"+titlelist[0].replace(/[\!\/\\]/g,"_")).html('<img src="'+json.cover+'"></img>');
+                }else{
+                  $("#"+titlelist[0].replace(/[\!\/\\]/g,"_")).html('cover image not found');
+                }
+                getCoverImages(rest(titlelist));
               })              
-            }else{
-              console.log(tempdata);
             }
           }
           getCoverImages(data.titles.map(function(ele){return ele.page;}));
