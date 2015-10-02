@@ -362,11 +362,12 @@ function seriesTitleFilterByDownload(postdata,res){
         //Get data about available volumes from the toc
         var one_off=!$("#toc ul li").text().match(/volume/i)? true: false;
         data.one_off=one_off;
+        console.log(data.title);
         $("#toc ul li").each(function(){   
           //Notes that each page format has its own quirks and the program attempts to match all of them
           if((($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) && 
                !$(this).text().match(/miscellaneous notes/i)) || 
-              (one_off && $(this).text().match(new RegExp(data.title, 'i')))) && 
+              (one_off && $(this).text().match(new RegExp(data.title.replace("_"," "), 'i')))) && 
               $(this).hasClass("toclevel-1")) {       
             //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
@@ -387,6 +388,7 @@ function seriesTitleFilterByDownload(postdata,res){
               volumedata.chapters=[];
               seriesdata.books.push(volumedata);
             };
+            console.log(seriesdata);
             if(seriesdata.books.length>0 || one_off){
               //Problem with one-offs, they do not contain any volumes.
               data.sections.push(seriesdata);
@@ -413,10 +415,11 @@ function seriesTitleFilterByDownload(postdata,res){
         }
                  
         
-        if(data.sections){
+        if(data.sections.length>0){
           //Determine the type of overall image placing
-          if(data.sections[0].books[0]){
-            var volheading=$(":header:contains('"+data.sections[0].books[0].title+"')").first();
+          var firstbook=one_off ? data.title.replace("_"," ") : data.sections[0].books[0]
+          if(firstbook){
+            var volheading=$(":header:contains('"+firstbook.title+"')").first();
             var coverimage=volheading.prevUntil($(":header")).find("img");
             var imageplacing=0;
             if(coverimage.attr('src')){
