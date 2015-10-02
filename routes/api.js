@@ -255,24 +255,27 @@ function seriesCategoryFilterByDownload(postdata,res){
         postlist.push(ele);
       }
     }
-    function getAllGenres(genreList,tempdata){
+    function getAllGenres(genreList,tempdata,start){
       if(tempdata==undefined) {
         tempdata={};
       }
-      var start=true;
+      if(start==undefined) {
+        start=true;
+      }
       var url = "action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:";
       if(genreList.length>0){
         url+=last(genreList);
         downloadJSONfromBakaTsukiMediaWiki(url,function(jsondata){
           if(jsondata.query && jsondata.query.pages){
             //console.log(jsondata.query.pages);
-            tempdata=mergeObjects(tempdata,jsondata.query.pages, true);
+            tempdata=mergeObjects(tempdata,jsondata.query.pages);
             console.log(Object.keys(tempdata).length);
-
-            getAllGenres(popb(genreList),tempdata);
-          }else{
-            getAllGenres([],{})
           }
+          if(Object.keys(tempdata).length==0 && start || Object.keys(tempdata).length>0){
+            getAllGenres(popb(genreList),tempdata,false);
+          }else{
+            getAllGenres([],tempdata,false);
+          }          
         })
       }else{
         //Reorganise the data
