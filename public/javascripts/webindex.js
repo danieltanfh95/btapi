@@ -34,7 +34,7 @@ function preparegenrebuttons(){
             return '<a href="https://baka-tsuki.org/project/index.php?title='+ele.page+'"><div class="col-md-6 pane">'+ele.title+'</div></a>';
           });
           //data is json data.
-          if(!html){
+          if(html==""){
             html="No novel found that matches that criteria."
           }
           $("#novels").html(html);
