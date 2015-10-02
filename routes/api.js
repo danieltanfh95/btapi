@@ -360,6 +360,8 @@ function seriesTitleFilterByDownload(postdata,res){
           data.synopsis=synopsisstring;
         }
 
+
+
         //Completed Preloading of Data
         //Get data about available volumes from the toc
         var one_off=!$("#toc ul li").text().match(/volume/i)? true: false;
