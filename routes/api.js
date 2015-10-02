@@ -444,7 +444,8 @@ function seriesTitleFilterByDownload(postdata,res){
             for(var volumekey in data.sections[serieskey].books){
               //First search for links in the heading.
               //This includes full text page versions.
-              var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title.match(/[A-Za-z\d\s]/i)+"')").first();
+              var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title.match(/[A-Za-z\d\s\:]+/gi)[0]+"')").first();
+
               var headinglinks=heading.find('a');
               headinglinks.each(function(){
                 //Reject links to edit the page or template and resource links.
@@ -465,6 +466,7 @@ function seriesTitleFilterByDownload(postdata,res){
               //Walk through the following sections for links until the next heading.
               var walker=heading.nextUntil($(":header"));
               var chapterlinks=walker.find("a");
+
               chapterlinks.each(function(){
                 //Remove red links to pages that does not exist too.  
                 //Include external links          
@@ -486,6 +488,7 @@ function seriesTitleFilterByDownload(postdata,res){
               });
               
               //Find the cover image in each volume section
+              console.log(imageplacing);
               if(imageplacing==3){
                 var coverimg=walker.find("img");
                 if(coverimg){
@@ -496,7 +499,8 @@ function seriesTitleFilterByDownload(postdata,res){
                   data.sections[serieskey].books[volumekey].cover=coverimgsrc;
                 }
               }else if(imageplacing==2){
-                var coverimg=heading.parentsUntil($(":header")).find("img");
+                //console.log(heading.parentsUntil("table").text())
+                var coverimg=heading.closest("table").find("img");
                 if(coverimg){
                   coverimgsrc=coverimg.attr('src');
                   if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
@@ -505,7 +509,7 @@ function seriesTitleFilterByDownload(postdata,res){
                   data.sections[serieskey].books[volumekey].cover=coverimgsrc;
                 }
               }else if(imageplacing==1){
-                var coverimg=heading.prevUntil($(":header")).find("img");
+                var coverimg=heading.prevUntil($(":header")).find("img");                
                 if(coverimg){
                   coverimgsrc=coverimg.attr('src');
                   if (coverimg.attr('src') && coverimg.attr('src').match(/^\/project/g)){
