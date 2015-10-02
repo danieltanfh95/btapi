@@ -675,7 +675,6 @@ function downloadJSONfromBakaTsukiMediaWiki(url_params, callback) {
       callback(JSON.parse(data));
     });
   }).on("error", function(err) {
-    //console.log(err);
     callback(null);
   });
 }
