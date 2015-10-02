@@ -601,6 +601,7 @@ function seriesTitleFilterByDownload(postdata,res){
         if(one_off){
           data.sections.map(function(ele){return ele.renameProperty("books","chapters");});
         }        
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.send(data); 
       }      
     });

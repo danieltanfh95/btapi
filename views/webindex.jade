@@ -3,9 +3,24 @@ extends layout
 block stylesheets
   link(rel='stylesheet', href='/stylesheets/webindex.css')
 block content
+  section
+    h1 Explore Baka Tsuki genres!
   section#genre-buttons
-    h1 
+    h2 
+      | Loading genres...
+      i.fa.fa-circle-o-notch.fa-spin
+    br
+  section
+    h3 Novels
+    .col-md-10#novels
+    .col-md-2
+  .card.btn.btn-info.loading.hide
+    p
       | Loading...
       i.fa.fa-circle-o-notch.fa-spin
+  .card.btn.btn-success.success.hide
+    p
+      | Success! 
+      i.fa.fa-thumbs-o-up
 block scripts
   script(src='javascripts/webindex.js')
