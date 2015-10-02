@@ -3,7 +3,7 @@ $(document).ready(function(){
 })
 
 function preparegenrebuttons(){
-  $.get( "https://baka-tsuki-api.herokuapp.com/api/category?category=genre", function( data ) {
+  $.get( "/api/category?category=genre", function( data ) {
     $("#genre-buttons").html(data.map(function(ele){
       return '<div class="btn btn-danger genrebutton">'+ele+'</div';
     }));
@@ -27,20 +27,15 @@ function preparegenrebuttons(){
       $(".card.success").addClass("hide");
       $(".card.loading").removeClass("hide");
 
-      $.get("https://baka-tsuki-api.herokuapp.com/api/category?genres="+html,function(data){
-        var html=data.titles.map(function(ele){
-          return '<a href="https://baka-tsuki.org/project/index.php?title='+ele.page+'"><div class="col-md-4 pane"><div class="pane-img"><i class="fa fa-circle-o-notch fa-spin"></i></div>'+ele.title+'</div></a>';
+      $.get("/api/category?genres="+html,function(data){
+        var html="";
+        html=data.titles.map(function(ele){
+          return '<a href="https://baka-tsuki.org/project/index.php?title='+ele.page+'"><div class="col-md-6 pane">'+ele.title+'</div></a>';
         });
         //data is json data.
         $("#novels").html(html);
         $(".card.loading").addClass("hide");
         $(".card.success").removeClass("hide").click(function(){$(this).addClass("hide");});
-        $(".pane .pane-img").each(function(){
-          console.log($(this).parent().text());
-          $.get("https://baka-tsuki-api.herokuapp.com/api?title="+$(this).parent().text(), function(data){
-            console.log(data.cover);
-          })
-        })
       })
     })
     

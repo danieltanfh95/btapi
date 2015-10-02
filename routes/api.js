@@ -231,13 +231,11 @@ function seriesCategoryFilterByDownload(postdata,res){
     })
   }else if(postdata.title){
     //Get all categories in this titles.
-    console.log(postdata.title);
     downloadJSONfromBakaTsukiMediaWiki("action=query&generator=categories&titles="+postdata.title,function(jsondata){
       res.send(jsondata.query.pages.map(function(ele){return ele.title.replace(/Category:/g,"");}));
     })
   }else{
     //Main bulk of the category search
-    console.log(postdata);
     postlist=[];
     if (postdata.list){
         var postlist=postdata.list.split("|");
@@ -431,7 +429,6 @@ function seriesTitleFilterByDownload(postdata,res){
               //First search for links in the heading.
               //This includes full text page versions.
               var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title.match(/[A-Za-z\d\s]/i)+"')").first();
-              console.log(heading.html());
               var headinglinks=heading.find('a');
               headinglinks.each(function(){
                 //Reject links to edit the page or template and resource links.
@@ -601,7 +598,6 @@ function seriesTitleFilterByDownload(postdata,res){
         if(one_off){
           data.sections.map(function(ele){return ele.renameProperty("books","chapters");});
         }        
-        res.setHeader('Access-Control-Allow-Origin', '*');
         res.send(data); 
       }      
     });
