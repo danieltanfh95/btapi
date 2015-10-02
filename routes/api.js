@@ -280,8 +280,14 @@ function seriesCategoryFilterByDownload(postdata,res){
               };})});
       }      
     }
-    //javascript requires this to ensure it is copied not changed
-    getAllGenres(postlist);
+    //Undocumented function, allows single category list search
+    if(!postdata.category){
+      getAllGenres(postlist);
+    }else{
+      downloadJSONfromBakaTsukiMediaWiki("action=query&generator=categorymembers&gcmlimit=500&gcmtitle=Category:"+postdata.category,function(jsondata){
+        res.send(jsondata.query.pages.map(function(ele){return ele.title.replace(/Category:/i,"");}));
+      });
+    }
   }
 }
 
