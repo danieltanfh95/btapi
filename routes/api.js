@@ -269,7 +269,6 @@ function seriesCategoryFilterByDownload(postdata,res){
           if(jsondata.query && jsondata.query.pages){
             //console.log(jsondata.query.pages);
             tempdata=mergeObjects(tempdata,jsondata.query.pages);
-            console.log(Object.keys(tempdata).length);
           }
           if(Object.keys(tempdata).length==0 && start || Object.keys(tempdata).length>0){
             getAllGenres(popb(genreList),tempdata,false);
@@ -366,7 +365,6 @@ function seriesTitleFilterByDownload(postdata,res){
         //Get data about available volumes from the toc
         var one_off=!$("#toc ul li").text().match(/volume/i)? true: false;
         data.one_off=one_off;
-        console.log(data.title);
         $("#toc ul li").each(function(){   
           //Notes that each page format has its own quirks and the program attempts to match all of them
           if((($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) && 
@@ -392,7 +390,6 @@ function seriesTitleFilterByDownload(postdata,res){
               volumedata.chapters=[];
               seriesdata.books.push(volumedata);
             };
-            console.log(seriesdata);
             if(seriesdata.books.length>0 || one_off){
               //Problem with one-offs, they do not contain any volumes.
               data.sections.push(seriesdata);
@@ -490,7 +487,6 @@ function seriesTitleFilterByDownload(postdata,res){
               });
               
               //Find the cover image in each volume section
-              console.log(imageplacing);
               if(imageplacing==3){
                 var coverimg=walker.find("img");
                 if(coverimg){
