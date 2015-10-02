@@ -258,11 +258,13 @@ function seriesCategoryFilterByDownload(postdata,res){
     function getAllGenres(genreList,tempdata){
       if(!tempdata) tempdata = {};
       var url = "action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:";
-      if(genreList.length>0){
+      if(genreList && genreList.length>0){
         url+=last(genreList);
         downloadJSONfromBakaTsukiMediaWiki(url,function(jsondata){
           if(jsondata.query && jsondata.query.pages){
             tempdata=mergeObjects(tempdata,jsondata.query.pages);
+          }else{
+            genreList=[null];
           }
           getAllGenres(popb(genreList),tempdata);
         })
@@ -616,7 +618,7 @@ function mergeObjects(obj1, obj2){
     }
   }else if(Object.keys(obj1).length<=0 || Object.keys(obj2).length<=0){
     console.log("Error");
-    finalobj = Object.keys(obj1).length>0 ? obj1 : obj2 ;
+    finalobj = {} ;
   }
   return finalobj;
 }
