@@ -317,7 +317,11 @@ function seriesTitleFilterByDownload(postdata,res){
         data.status=status ? status[0].toLowerCase() : "active";
         data.author="";
         data.synopsis="";
+        $("table:contains(Project)").html("");
         data.cover=$(".thumbinner").find("img").attr('src');
+        if(!data.cover){
+          data.cover=$("img").first().attr('src');
+        }
         if (data.cover && data.cover.match(/^\/project/g)){
           data.cover="https://www.baka-tsuki.org"+data.cover;
         }
@@ -330,8 +334,6 @@ function seriesTitleFilterByDownload(postdata,res){
         if(data.categories.indexOf("Completed Project")>=0){
           data.status="completed";
         }
-
-        //$("table:contains(Project)").html("");
         
         var synopsiswalk = $(":header").filter(function(){
           return $(this).text().match(/synopsis/i)!=null;
