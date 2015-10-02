@@ -37,8 +37,8 @@ function pageDownload(postdata,res){
     downloadHTMLfromBakaTsuki(postdata.title,function(jsondata){
       if(jsondata){ 
         var $=cheerio.load(jsondata);        
-        //var content=$("#content").html();
-        //$("body").html(content);
+        var content=$("#content").html();
+        $("body").html(content);
         $("a").each(function(){
           var ele=$(this).attr('href');
           if(ele && ele.match(/^\/project/)){
