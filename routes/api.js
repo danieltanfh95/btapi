@@ -256,17 +256,23 @@ function seriesCategoryFilterByDownload(postdata,res){
       }
     }
     function getAllGenres(genreList,tempdata){
-      if(!tempdata) tempdata = {};
+      if(tempdata==undefined) {
+        tempdata={};
+      }
+      var start=true;
       var url = "action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:";
-      if(genreList && genreList.length>0){
+      if(genreList.length>0){
         url+=last(genreList);
         downloadJSONfromBakaTsukiMediaWiki(url,function(jsondata){
           if(jsondata.query && jsondata.query.pages){
-            tempdata=mergeObjects(tempdata,jsondata.query.pages);
+            //console.log(jsondata.query.pages);
+            tempdata=mergeObjects(tempdata,jsondata.query.pages, true);
+            console.log(Object.keys(tempdata).length);
+
+            getAllGenres(popb(genreList),tempdata);
           }else{
-            genreList=[null];
+            getAllGenres([],{})
           }
-          getAllGenres(popb(genreList),tempdata);
         })
       }else{
         //Reorganise the data
@@ -616,9 +622,9 @@ function mergeObjects(obj1, obj2){
         finalobj[key]=obj2[key];
       }
     }
-  }else if(Object.keys(obj1).length<=0 || Object.keys(obj2).length<=0){
+  }else if(Object.keys(obj1).length==0 || Object.keys(obj2).length==0){
     console.log("Error");
-    finalobj = {} ;
+    finalobj = Object.keys(obj1).length==0 ? obj2 : obj1 ; 
   }
   return finalobj;
 }
