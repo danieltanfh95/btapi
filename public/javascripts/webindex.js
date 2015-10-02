@@ -31,7 +31,7 @@ function preparegenrebuttons(){
         $.get("/api/category?genres="+html,function(data){
           var html="";
           html=data.titles.map(function(ele){
-            return '<a href="https://baka-tsuki.org/project/index.php?title='+ele.page+'"><div class="col-md-4 pane"><div class="pane-img" id='+ele.page.replace(/[\!\/\\\.]/g,"_")+'><i class="fa fa-circle-o-notch fa-spin"></i></div>'+ele.title+'</div></a>';
+            return '<a href="https://baka-tsuki.org/project/index.php?title='+ele.page+'"><div class="col-md-4 pane"><div class="pane-img" id='+ele.page.replace(/[\!\/\\\.\,]/g,"_")+'><i class="fa fa-circle-o-notch fa-spin"></i></div>'+ele.title+'</div></a>';
           });
           //data is json data.
           if(html==""){
@@ -46,9 +46,9 @@ function preparegenrebuttons(){
               $.get("/api?title="+titlelist[0],function(json){
                 console.log(json.cover);
                 if(json.cover){
-                  $("#"+titlelist[0].replace(/[\!\/\\\.]/g,"_")).html('<img src="'+json.cover+'"></img>');
+                  $("#"+titlelist[0].replace(/[\!\/\\\.\,]/g,"_")).html('<img src="'+json.cover+'"></img>');
                 }else{
-                  $("#"+titlelist[0].replace(/[\!\/\\\.]/g,"_")).html('cover image not found');
+                  $("#"+titlelist[0].replace(/[\!\/\\\.\,]/g,"_")).html('cover image not found');
                 }
                 getCoverImages(rest(titlelist));
               })              
