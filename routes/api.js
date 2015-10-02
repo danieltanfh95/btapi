@@ -9,6 +9,7 @@ function routeHandler(req,res,route_name,callback){
   if(Object.keys(postdata).length<1){
     res.redirect(route_name);
   }else{
+    res.setHeader('Access-Control-Allow-Origin', '*');
     callback(postdata,res);
   }  
 }
