@@ -312,7 +312,7 @@ function seriesTitleFilterByDownload(postdata,res){
         //Preload the data for the light novel
         data.title=postdata.title;
         data.sections=[];
-        var status= $("div:contains('Project')").text().match(/HALTED|IDLE|ABANDONED|WARNING/i);
+        var status= $("table:contains('Project')").text().match(/HALTED|IDLE|ABANDONED|WARNING/i);
         data.status=status ? status[0].toLowerCase() : "active";
         data.author="";
         data.synopsis="";
@@ -332,6 +332,8 @@ function seriesTitleFilterByDownload(postdata,res){
         });
         if(data.categories.indexOf("Completed Project")>=0){
           data.status="completed";
+        }else if(data.categories.indexOf("Active Project")>=0){
+          data.status="active";
         }
         
         var synopsiswalk = $(":header").filter(function(){
