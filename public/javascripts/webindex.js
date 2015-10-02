@@ -40,6 +40,19 @@ function preparegenrebuttons(){
           $("#novels").html(html);
           $(".card.loading").addClass("hide");
           $(".card.success").removeClass("hide").click(function(){$(this).addClass("hide");});
+          function getCoverImages(titlelist,tempdata){
+            if(tempdata==undefined) tempdata={};
+            if(titlelist.length>0){             
+              $.get("/api?title="+titlelist[0],function(json){
+                console.log(json.cover);
+                tempdata[titlelist[0]]=titlelist[0];
+                getCoverImages(rest(titlelist),tempdata);
+              })              
+            }else{
+              console.log(tempdata);
+            }
+          }
+          getCoverImages(data.titles.map(function(ele){return ele.page;}));
         })
       }else{
         $("#novels").html("");
@@ -47,4 +60,15 @@ function preparegenrebuttons(){
     })
     
   });
+}
+
+function last(arr){
+  return arr[arr.length-1];
+}
+
+function rest(arr){
+  return arr.slice(1, arr.length);
+}
+function popb(arr){
+  return arr.slice(0, arr.length-1);
 }
