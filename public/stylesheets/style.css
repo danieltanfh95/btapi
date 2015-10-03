@@ -24,3 +24,6 @@ code {
   opacity: 0.95;
   filter: alpha(opacity=95);
 }
+.nav.navbar-nav{
+  overflow: hidden;
+}
