@@ -10,7 +10,11 @@ function routeHandler(req,res,route_name,callback){
     res.redirect(route_name);
   }else{
     res.setHeader('Access-Control-Allow-Origin', '*');
-    callback(postdata,res);
+    try{      
+      callback(postdata,res);
+    }catch(err){
+      res.send({"error":err});
+    }
   }  
 }
 router.get('/',function(req,res){
