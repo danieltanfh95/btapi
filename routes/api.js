@@ -1,6 +1,9 @@
 var express = require('express');
 var cheerio= require('cheerio');
 var https=require('https');
+//var Stopwatch = require("node-stopwatch").Stopwatch;
+//var stopwatch = Stopwatch.create();
+
 var router = express.Router();
 
 /* New parsing method */
@@ -41,15 +44,16 @@ function pageDownload(postdata,res){
   if(postdata.title){
     downloadHTMLfromBakaTsuki(postdata.title,function(jsondata){
       if(jsondata){ 
-        var $=cheerio.load(jsondata);        
-        var content=$("#content").html();
-        $("body").html(content);
+        //stopwatch.start();
+        var $=cheerio.load(jsondata);
+        $("script,link").remove();
+        $("body").replaceWith($("#content"));        
         $("a").each(function(){
           var ele=$(this).attr('href');
           if(ele && ele.match(/^\/project/)){
             $(this).attr('href',"https://www.baka-tsuki.org"+ele);
           }
-        })
+        })        
         $("img").each(function(){
           var ele=$(this).attr('src');
           if(ele && ele.match(/^\/project/)){
@@ -57,6 +61,7 @@ function pageDownload(postdata,res){
           }
         })
         res.send($.html());
+        //stopwatch.stop();
       }
     });
   }
@@ -310,9 +315,9 @@ function seriesTitleFilterByDownload(postdata,res){
     downloadHTMLfromBakaTsuki(postdata.title, function(jsondata){
       var data={};   
       if(jsondata){
-        var $=cheerio.load(jsondata)
-        var content=$("#content").html();
-        $("body").html(content);
+        //DEBUG
+        var $=cheerio.load(jsondata);
+        $("body").replaceWith($("#content"));   
         //Preload the data for the light novel
         data.title=postdata.title;
         data.sections=[];
@@ -329,6 +334,7 @@ function seriesTitleFilterByDownload(postdata,res){
           data.cover="https://www.baka-tsuki.org"+data.cover;
         }
 
+
         //get categories
         data.categories=[];
         $("#mw-normal-catlinks ul li").each(function(){
@@ -338,8 +344,8 @@ function seriesTitleFilterByDownload(postdata,res){
           data.status="completed";
         }else if(data.categories.indexOf("Active Project")>=0){
           data.status="active";
-        }
-        
+        }        
+
         var synopsiswalk = $(":header").filter(function(){
           return $(this).text().match(/synopsis/i)!=null;
         }).nextUntil($(":header")); 
@@ -365,7 +371,7 @@ function seriesTitleFilterByDownload(postdata,res){
           data.synopsis=synopsisstring;
         }
 
-
+        //DEBUG BOTTLENECK AT LOOP BELOW
 
         //Completed Preloading of Data
         //Get data about available volumes from the toc
@@ -379,7 +385,7 @@ function seriesTitleFilterByDownload(postdata,res){
               $(this).hasClass("toclevel-1")) {       
             //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });
-            var volumesnames=volumelist.slice(1,volumelist.length);
+            var volumesnames=rest(volumelist);
             var seriesname=stripNumbering(volumelist[0]);
             var authorname=seriesname.split(/\sby\s/g);
             
@@ -388,20 +394,18 @@ function seriesTitleFilterByDownload(postdata,res){
             }       
             //Prepare nested JSON format for volume list for each series.  
             var seriesdata={};
-            seriesdata.title= seriesname;
-            seriesdata.books=[];        
-            for(var key in volumesnames){
-              var volumedata={};
-              volumedata.title=stripNumbering(volumesnames[key]);
-              volumedata.chapters=[];
-              seriesdata.books.push(volumedata);
-            };
+            seriesdata.title= seriesname;      
+            seriesdata.books=volumesnames.map(function(ele){return {
+              "title":stripNumbering(ele),
+              "chapters":[]
+            };});
             if(seriesdata.books.length>0 || one_off){
               //Problem with one-offs, they do not contain any volumes.
               data.sections.push(seriesdata);
             }
           }          
         })
+
         //Sometimes the data for authors is hidden in the first paragraph instead
         if(!data.author && $("p").text().match(/\sby\s(.+)\./i)){
           //Search for author name between "by" and a non-character or the word "and"
@@ -419,8 +423,7 @@ function seriesTitleFilterByDownload(postdata,res){
               data.illustrator="";
             }
           }
-        }
-                 
+        }                 
         
         if(data.sections.length>0){
           //Determine the type of overall image placing
@@ -467,7 +470,7 @@ function seriesTitleFilterByDownload(postdata,res){
                   }
                   data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
                 } 
-              });
+              })
               //Walk through the following sections for links until the next heading.
               var walker=heading.nextUntil($(":header"));
               var chapterlinks=walker.find("a");
@@ -570,7 +573,6 @@ function seriesTitleFilterByDownload(postdata,res){
           }
         }
 
-
         // Filtering mechanism
         // While this may be wasteful since we don't filter while we insert the data,
         // However, this provides future oppurtunity to cache results instead of parsing it everytime.
@@ -622,7 +624,9 @@ function seriesTitleFilterByDownload(postdata,res){
         if(one_off){
           data.sections.map(function(ele){return ele.renameProperty("books","chapters");});
         }        
+
         res.send(data); 
+      
       }      
     });
   }
@@ -661,8 +665,7 @@ function popb(arr){
 }
 
 function stripNumbering(line){
-  line=line.replace(/^\s+|\s+$/g, '').split(/ /g);
-  return line.slice(1,line.length).join(" ");
+  return rest(line.replace(/^\s+|\s+$/g, '').split(/ /g)).join(" ");
 }
 function arrayUnique (a) {
     return a.reduce(function(p, c) {
