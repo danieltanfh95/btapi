@@ -6,12 +6,16 @@ var https=require('https');
 
 var router = express.Router();
 
-/* New parsing method */
 function routeHandler(req,res,route_name,callback){
-  var postdata=req.query;
+
+  //Expanding the method to other HTTPS methods
+  if(req.method=="GET") var postdata=req.query;
+  else if(req.method=="POST") var postdata=req.body;
+
   if(Object.keys(postdata).length<1){
     res.redirect(route_name);
   }else{
+    //Allow anyone to access the data, can be set to specific domain
     res.setHeader('Access-Control-Allow-Origin', '*');
     try{      
       callback(postdata,res);
@@ -44,10 +48,12 @@ function pageDownload(postdata,res){
   if(postdata.title){
     downloadHTMLfromBakaTsuki(postdata.title,function(jsondata){
       if(jsondata){ 
-        //stopwatch.start();
         var $=cheerio.load(jsondata);
+        //Remove any stylesheets and script 
         $("script,link").remove();
-        $("body").replaceWith($("#content"));        
+        //We only need the content
+        $("body").replaceWith($("#content"));  
+        //Get the absolute URL for links.      
         $("a").each(function(){
           var ele=$(this).attr('href');
           if(ele && ele.match(/^\/project/)){
@@ -61,14 +67,15 @@ function pageDownload(postdata,res){
           }
         })
         res.send($.html());
-        //stopwatch.stop();
       }
     });
   }
 }
 
 function seriesGenreFilterByDownload(postdata,res){
-  //var postdata=req.query;
+  //This piece of code will be taken out in favour of a 
+  //general category search.
+  //As such it will not be maintained.
   if(postdata.list){ 
     var postlist=postdata.list.split("|").map(function(ele){return capitalizeFirstLetter(ele.replace(/Genre[\s_]?-[\s_]?/i,""));});
     function getAllGenres(genreList,tempdata){
@@ -107,8 +114,12 @@ function seriesGenreFilterByDownload(postdata,res){
 
 function lastUpdatesTimeByDownload(postdata,res){
   if(postdata.titles||postdata.pageids){
+    //This method does not allow checking if the page has just been created
+    //That will have to depend on local caching on the application
+    //As there would have to be a reference time to check if the page has been created or not.
     downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&titles="+postdata.titles, function(titledata){
       downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&pageids="+postdata.pageids, function(pagedata){
+        //Not using map and filter to prevent nulls into the array easily
         var data=[];
         if(titledata.query.normalized[0].from!="undefined" && !titledata.query.pages["-1"]){
           for(var ind in titledata.query.pages){
@@ -139,6 +150,7 @@ function lastUpdatesTimeByDownload(postdata,res){
     postdata.updates=postdata.updates.match(/\d/g).join("");
     //returns the latest newest pages up to a certain number
     //Mediawiki limits the output to 500 so there might a few calls before you get all the data you need.
+    //Use the date time as a continuekey instead.
     function getLatestRevision(continuekey,maxmatches,data) {
       var url="action=query&list=recentchanges&rclimit="+maxmatches;
       if(continuekey){
@@ -186,11 +198,13 @@ function lastUpdatesTimeByDownload(postdata,res){
 
 //Use transducers instead of for loops
 function seriesCategoryFilterByDownload(postdata,res){
-  //console.log(postlist.list, postdata.genres);
+  //A special method for this as Baka Tsuki treats types and languages as one category each.
+  //Example: Light_Novel_(English)
   if(!postdata.title && !postdata.list && !postdata.genres && postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
     var titletype=capitalizeFirstLetter(postdata.type.toLowerCase());
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     var category =titletype+"_("+language+")";
+    //Note that the use of gcmlimit=500 only works now when there is only around 150-255 light novels in BT.
     downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:"+category, function(jsondata){
       res.send({
         "type": titletype,
@@ -206,6 +220,7 @@ function seriesCategoryFilterByDownload(postdata,res){
     })    
   }else if(postdata.language && !postdata.type){
     //Only provide a list of title types for the language
+    //Example: English : Light Novel, Teaser, Original Novel
     var language =capitalizeFirstLetter(postdata.language.toLowerCase());
     downloadJSONfromBakaTsukiMediaWiki("action=query&cmlimit=400&list=categorymembers&cmtitle=Category:"+language, 
       function(jsondata){
@@ -246,6 +261,7 @@ function seriesCategoryFilterByDownload(postdata,res){
   }else{
     //Main bulk of the category search
     postlist=[];
+    //List of category tags.
     if (postdata.list){
         var postlist=postdata.list.split("|");
     }
@@ -265,18 +281,13 @@ function seriesCategoryFilterByDownload(postdata,res){
       }
     }
     function getAllGenres(genreList,tempdata,start){
-      if(tempdata==undefined) {
-        tempdata={};
-      }
-      if(start==undefined) {
-        start=true;
-      }
+      if(tempdata==undefined) tempdata={};     
+      if(start==undefined) start=true;
       var url = "action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:";
       if(genreList.length>0){
         url+=last(genreList);
         downloadJSONfromBakaTsukiMediaWiki(url,function(jsondata){
           if(jsondata.query && jsondata.query.pages){
-            //console.log(jsondata.query.pages);
             tempdata=mergeObjects(tempdata,jsondata.query.pages);
           }
           if(Object.keys(tempdata).length==0 && start || Object.keys(tempdata).length>0){
@@ -371,9 +382,8 @@ function seriesTitleFilterByDownload(postdata,res){
           data.synopsis=synopsisstring;
         }
 
-        //DEBUG BOTTLENECK AT LOOP BELOW
-
         //Completed Preloading of Data
+
         //Get data about available volumes from the toc
         var one_off=!$("#toc ul li").text().match(/volume/i)? true: false;
         data.one_off=one_off;
@@ -447,13 +457,12 @@ function seriesTitleFilterByDownload(postdata,res){
                 }
             }
           } 
-          //Search for available chapters and their interwikilinks from the page.
+          //Search for available chapters and their active wikilinks from the page.
           for(var serieskey in data.sections){
             for(var volumekey in data.sections[serieskey].books){
               //First search for links in the heading.
               //This includes full text page versions.
               var heading=$(":header:contains('"+data.sections[serieskey].books[volumekey].title.match(/[A-Za-z\d\s\:]+/gi)[0]+"')").first();
-
               var headinglinks=heading.find('a');
               headinglinks.each(function(){
                 //Reject links to edit the page or template and resource links.
@@ -471,13 +480,11 @@ function seriesTitleFilterByDownload(postdata,res){
                   data.sections[serieskey].books[volumekey].chapters.push(chapterdata);
                 } 
               })
+
               //Walk through the following sections for links until the next heading.
               var walker=heading.nextUntil($(":header"));
               var chapterlinks=walker.find("a");
-
               chapterlinks.each(function(){
-                //Remove red links to pages that does not exist too.  
-                //Include external links          
                 if(!$(this).attr('href').match(/edit|Template/g)){
                   alternatetext = $(this).first().text().split(" ").length>1 ? $(this).first().text() : $(this).parent().first().text(); 
                   var titletext=$(this).attr('title') ? $(this).attr('title') :alternatetext;
@@ -527,7 +534,6 @@ function seriesTitleFilterByDownload(postdata,res){
               }
             }
             //This covers the special case where the series contains direct links to stories instead of volumes.
-            //Kino no tabi
             if( data.sections[serieskey].books.length<1){
               var walker=$(":header:contains('"+data.sections[serieskey].title+"')").nextUntil($(":header"));
               var chapterlinks=walker.find("a");
@@ -551,7 +557,7 @@ function seriesTitleFilterByDownload(postdata,res){
             }
 
             //Special Sugar_Dark Edge Case: Chapters in volume is categorised by other sections.
-            //This is only for cases where there is no obvioes order in chapters.
+            //This is only for cases where there is no obvious order in chapters.
             //I.e. multiple chapter 1's
             //This code should be changed in favour of a depth-2 search for li elements, 
             //but most novels isn't format that way.
@@ -623,10 +629,8 @@ function seriesTitleFilterByDownload(postdata,res){
         }
         if(one_off){
           data.sections.map(function(ele){return ele.renameProperty("books","chapters");});
-        }        
-
-        res.send(data); 
-      
+        }
+        res.send(data);       
       }      
     });
   }
