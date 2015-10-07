@@ -284,6 +284,13 @@ module.exports.seriesTitleFilterByDownload = function (postdata,res){
       var data={};   
       if(jsondata){
         var $=cheerio.load(jsondata);
+
+        //check if the page exists
+        if($("#content").text().match(/There is currently no text in this page/i)){
+          res.send({"error":"Page does not exist."});
+          return false;
+        }
+
         $("body").replaceWith($("#content"));   
         //Preload the data for the light novel
         data.title=postdata.title;
