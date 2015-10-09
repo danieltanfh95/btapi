@@ -1,7 +1,8 @@
 var cheerio= require('cheerio');
 var utils=require('./utils');
 
-module.exports.pageDownload = function (postdata,res){
+novels={};
+novels.pageDownload = function (postdata,res){
   if(postdata.title){
     utils.downloadHTMLfromBakaTsuki(postdata.title,function(jsondata){
       if(jsondata){ 
@@ -29,7 +30,7 @@ module.exports.pageDownload = function (postdata,res){
   }
 }
 
-module.exports.seriesGenreFilterByDownload = function (postdata,res){
+novels.seriesGenreFilterByDownload = function (postdata,res){
   //This piece of code will be taken out in favour of a 
   //general category search.
   //As such it will not be maintained.
@@ -69,7 +70,7 @@ module.exports.seriesGenreFilterByDownload = function (postdata,res){
   }
 }
 
-module.exports.lastUpdatesTimeByDownload = function (postdata,res){
+novels.lastUpdatesTimeByDownload = function (postdata,res){
   if(postdata.titles||postdata.pageids){
     //This method does not allow checking if the page has just been created
     //That will have to depend on local caching on the application
@@ -154,7 +155,7 @@ module.exports.lastUpdatesTimeByDownload = function (postdata,res){
 }
 
 //Use transducers instead of for loops
-module.exports.seriesCategoryFilterByDownload = function (postdata,res){
+novels.seriesCategoryFilterByDownload = function (postdata,res){
   //A special method for this as Baka Tsuki treats types and languages as one category each.
   //Example: Light_Novel_(English)
   if(!postdata.title && !postdata.list && !postdata.genres && postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
@@ -277,7 +278,7 @@ module.exports.seriesCategoryFilterByDownload = function (postdata,res){
   }
 }
 
-module.exports.seriesTitleFilterByDownload = function (postdata,res){
+novels.seriesTitleFilterByDownload = function (postdata,res){
   // Continue only if series title is available.
   if(postdata.title){
     utils.downloadHTMLfromBakaTsuki(postdata.title, function(jsondata){
@@ -598,3 +599,5 @@ module.exports.seriesTitleFilterByDownload = function (postdata,res){
     });
   }
 }
+
+module.exports=novels;

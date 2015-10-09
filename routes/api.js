@@ -3,10 +3,7 @@ var novels=require('./novels');
 var router = express.Router();
 
 function routeHandler(req,res,route_name,callback){
-  //Expanding the method to other HTTPS methods
-  if(req.method=="GET") var postdata=req.query;
-  else if(req.method=="POST") var postdata=req.body;
-
+  postdata=req.query;
   if(Object.keys(postdata).length<1){
     res.redirect(route_name);
   }else{
