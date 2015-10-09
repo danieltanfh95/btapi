@@ -2,7 +2,7 @@
   "name": "btapi",
   "version": "0.0.0",
   "description": "A sample Node.js app using Express 4",
-  "main": "./bin/www",
+  "main": "bin/www",
   "scripts": {
     "start": "node ./bin/www"
   },
