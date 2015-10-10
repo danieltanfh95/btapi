@@ -7,7 +7,8 @@
 
 This is the new API for [Baka Tsuki](https://www.baka-tsuki.org/project/index.php?title=Main_Page), based on the [original mediawiki API](https://www.baka-tsuki.org/project/api.php). 
 This project is born out of :heart: for Baka Tsuki and also the #$%@#@ when trying to get any information out of the Baka Tsuki pages. There are just too many parsers but none of them can handle all the nearly random ways BT projects can be formatted.
-It is currently hosted on Heroku [here](https://baka-tsuki-api.herokuapp.com/) but you can also host it yourself through NodeJS.
+~~It is currently hosted on Heroku [here](https://baka-tsuki-api.herokuapp.com/) but you can also host it yourself through NodeJS.~~
+**Edit: [The application is hosted on OpenShift now](http://btapi-shadowys.rhcloud.com/)! Say no more to dynos sleeping!**
 
 The API for the following has stabilised:
 - [X] Getting data of novel series.

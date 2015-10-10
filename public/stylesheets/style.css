@@ -18,6 +18,9 @@ code {
   .mobile-only{
     display:none;
   }
+  body {
+    padding: 10px;
+  }
 }
 .tooltip > .tooltip-inner {background-color: black;}
 .tooltip.in {
