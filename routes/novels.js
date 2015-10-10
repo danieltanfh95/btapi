@@ -402,6 +402,7 @@ novels.seriesTitleFilterByDownload = function (postdata,res){
         if(data.sections.length>0){
           //Determine the type of overall image placing
           var firstbook=one_off ? data.title.replace(/_/g," ") : data.sections[0].books[0]
+          console.log(firstbook);
           if(firstbook){
             var volheading=$(":header:contains('"+firstbook.title+"')").first();
             var coverimage=volheading.prevUntil($(":header")).find("img");
@@ -411,16 +412,18 @@ novels.seriesTitleFilterByDownload = function (postdata,res){
               imageplacing=1;
             }
             else{
-              coverimage=volheading.parentsUntil($(":header")).find("img");
+              coverimage=volheading.nextUntil($(":header")).find("img");
+              console.log(coverimage.attr('src'));
                 if(coverimage.attr('src')){
                   //Image in tables before the heading
-                  imageplacing=2;
+                  imageplacing=3;
                 }else{
                   //Image in the sections after the heading
-                  imageplacing=3;
+                  imageplacing=2;
                 }
             }
           } 
+          console.log(imageplacing);
           //Search for available chapters and their active wikilinks from the page.
           for(var serieskey in data.sections){
             for(var volumekey in data.sections[serieskey].books){
@@ -449,7 +452,8 @@ novels.seriesTitleFilterByDownload = function (postdata,res){
               var walker=heading.nextUntil($(":header"));
               var chapterlinks=walker.find("a");
               chapterlinks.each(function(){
-                if(!$(this).attr('href').match(/edit|Template/g)){
+                if(!$(this).attr('href').match(/edit|Template/g) &&
+                   !$(this).find("img").attr("src")) {
                   alternatetext = $(this).first().text().split(" ").length>1 ? $(this).first().text() : $(this).parent().first().text(); 
                   var titletext=$(this).attr('title') ? $(this).attr('title') :alternatetext;
                   var chapterdata={};
