@@ -19,9 +19,14 @@ To do:
 - [ ] Add method to get user data.
 - [ ] Add method to push new changes to page.
 - [ ] Add method to delete a page.
+- [ ] Add tests to ensure validity of data
+
+###Tests
+Run `npm test`. 
 
 ###Technologies
 This API uses NodeJS, [ExpressJS](http://expressjs.com/) for the backend, [CheerioJS](http://cheeriojs.github.io/cheerio/) for quick and forgiving parsing and tranversing HTML, and [Nodemon](http://nodemon.io/) during development to reload code.
+For full list of modules used, look at [package.json](https://github.com/Shadowys/btapi/blob/master/package.json).
 
 ###Development
 Clone the repo, or download the zip. Run `npm start` or `nodemon ./bin/www` to start the local server. Currently the main bulk of the logic lies in [`api.js`](https://github.com/Shadowys/btapi/blob/master/routes/api.js). 
