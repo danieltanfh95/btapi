@@ -402,7 +402,6 @@ novels.seriesTitleFilterByDownload = function (postdata,res){
         if(data.sections.length>0){
           //Determine the type of overall image placing
           var firstbook=one_off ? data.title.replace(/_/g," ") : data.sections[0].books[0]
-          console.log(firstbook);
           if(firstbook){
             var volheading=$(":header:contains('"+firstbook.title+"')").first();
             var coverimage=volheading.prevUntil($(":header")).find("img");
@@ -413,7 +412,6 @@ novels.seriesTitleFilterByDownload = function (postdata,res){
             }
             else{
               coverimage=volheading.nextUntil($(":header")).find("img");
-              console.log(coverimage.attr('src'));
                 if(coverimage.attr('src')){
                   //Image in tables before the heading
                   imageplacing=3;
@@ -423,7 +421,6 @@ novels.seriesTitleFilterByDownload = function (postdata,res){
                 }
             }
           } 
-          console.log(imageplacing);
           //Search for available chapters and their active wikilinks from the page.
           for(var serieskey in data.sections){
             for(var volumekey in data.sections[serieskey].books){
@@ -481,7 +478,6 @@ novels.seriesTitleFilterByDownload = function (postdata,res){
                   data.sections[serieskey].books[volumekey].cover=coverimgsrc;
                 }
               }else if(imageplacing==2){
-                //console.log(heading.parentsUntil("table").text())
                 var coverimg=heading.closest("table").find("img");
                 if(coverimg){
                   coverimgsrc=coverimg.attr('src');
