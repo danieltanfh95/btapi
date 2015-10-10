@@ -159,8 +159,8 @@ novels.seriesCategoryFilterByDownload = function (postdata,res){
   //A special method for this as Baka Tsuki treats types and languages as one category each.
   //Example: Light_Novel_(English)
   if(!postdata.title && !postdata.list && !postdata.genres && postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
-    var titletype=utils.capitalizeFirstLetter(postdata.type.toLowerCase());
-    var language =utils.capitalizeFirstLetter(postdata.language.toLowerCase());
+    var titletype=utils.capitalizeFirstLetter(postdata.type);
+    var language =utils.capitalizeFirstLetter(postdata.language);
     var category =titletype+"_("+language+")";
     //Note that the use of gcmlimit=500 only works now when there is only around 150-255 light novels in BT.
     utils.downloadJSONfromBakaTsukiMediaWiki("action=query&prop=info|revisions&generator=categorymembers&gcmlimit=500&gcmtype=page&gcmtitle=Category:"+category, function(jsondata){
@@ -179,7 +179,7 @@ novels.seriesCategoryFilterByDownload = function (postdata,res){
   }else if(postdata.language && !postdata.type){
     //Only provide a list of title types for the language
     //Example: English : Light Novel, Teaser, Original Novel
-    var language =utils.capitalizeFirstLetter(postdata.language.toLowerCase());
+    var language =utils.capitalizeFirstLetter(postdata.language);
     utils.downloadJSONfromBakaTsukiMediaWiki("action=query&cmlimit=400&list=categorymembers&cmtitle=Category:"+language, 
       function(jsondata){
         res.send({
@@ -191,7 +191,7 @@ novels.seriesCategoryFilterByDownload = function (postdata,res){
       })
   }else if(postdata.type && !postdata.type.match(/Original_?novel/i) && !postdata.language){
     //Provide languages available for that type.
-    var titletype =utils.capitalizeFirstLetter(postdata.type.toLowerCase());
+    var titletype =utils.capitalizeFirstLetter(postdata.type);
     utils.downloadJSONfromBakaTsukiMediaWiki("action=query&cmlimit=400&list=categorymembers&cmtitle=Category:"+titletype, function(jsondata){
       res.send({
         "types": titletype,
@@ -224,8 +224,8 @@ novels.seriesCategoryFilterByDownload = function (postdata,res){
         var postlist=postdata.list.split("|");
     }
     if(postdata.language && postdata.type && !postdata.type.match(/Original_?novel/i)){
-      var titletype=utils.capitalizeFirstLetter(postdata.type.toLowerCase());
-      var language =utils.capitalizeFirstLetter(postdata.language.toLowerCase());
+      var titletype=utils.capitalizeFirstLetter(postdata.type);
+      var language =utils.capitalizeFirstLetter(postdata.language);
       postlist.push(titletype+"_("+language+")");
     }else if(postdata.type && postdata.type.match(/Original_?novel/i)){
       postlist.push("Original_novel");
@@ -297,7 +297,7 @@ novels.seriesTitleFilterByDownload = function (postdata,res){
         data.title=postdata.title;
         data.sections=[];
         var status= $("table:contains('Project')").text().match(/HALTED|IDLE|ABANDONED|WARNING/i);
-        data.status=status ? status[0].toLowerCase() : "active";
+        data.status=status ? status[0] : "active";
         data.author="";
         data.synopsis="";
         $("table:contains(Project)").html("");

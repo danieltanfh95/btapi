@@ -12,14 +12,14 @@ utils.mergeObjects=function(obj1, obj2){
       }
     }
   }else if(Object.keys(obj1).length==0 || Object.keys(obj2).length==0){
-    console.log("Error");
     finalobj = Object.keys(obj1).length==0 ? obj2 : obj1 ; 
   }
   return finalobj;
 }
 
 utils.capitalizeFirstLetter=function(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+  string=string.toLowerCase();
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 utils.last=function(arr){
