@@ -24,6 +24,7 @@
     "mocha": "^2.3.3",
     "morgan": "~1.2.3",
     "node-stopwatch": "0.0.1",
+    "nodemon": "^1.7.1",
     "request": "^2.64.0",
     "serve-favicon": "~2.0.1"
   }
