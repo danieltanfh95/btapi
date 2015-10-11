@@ -14,19 +14,24 @@ code {
   width: 100%;
   background-color: aliceblue;
 }
-@media(min-width: 768px){
-  .mobile-only{
-    display:none;
+@media(max-width: 768px){
+  html {
+    padding-top: 50px;
   }
   body {
-    padding: 10px;
+    padding: 20px;
+  }
+  .nav.navbar-nav{
+    overflow: hidden;
+    margin: 0px;
+    background-color: white;
+  }
+  .collapse.navbar-collapse{   
+    box-shadow: 2px 2px 2px #666666;
   }
 }
 .tooltip > .tooltip-inner {background-color: black;}
 .tooltip.in {
   opacity: 0.95;
   filter: alpha(opacity=95);
-}
-.nav.navbar-nav{
-  overflow: hidden;
 }
