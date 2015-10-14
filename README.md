@@ -25,6 +25,8 @@ To do:
 ###Tests
 Run `npm test`. 
 
+Test coverage is still quite low as of now (45% of utils.js only) but I'll be adding more tests before I introduce any new features.
+
 ###Technologies
 This API uses NodeJS, [ExpressJS](http://expressjs.com/) for the backend, [CheerioJS](http://cheeriojs.github.io/cheerio/) for quick and forgiving parsing and tranversing HTML, and [Nodemon](http://nodemon.io/) during development to reload code.
 For full list of modules used, look at [package.json](https://github.com/Shadowys/btapi/blob/master/package.json).
