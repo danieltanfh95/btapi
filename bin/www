@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-var debug = require('debug')('btapi');
-var app = require('../app');
 
-app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 3000);
-app.set('ip', process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1');
+//Edit this place to set the port number and ip addess of the server that is running the application.
+//It defaults to localhost:3000
+var USER_PORT_NUMBER = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+var USER_ID_ADDRESS  = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
-var server = app.listen(app.get('port'),app.get('ip'), function() {
-  debug('Express server listening on port ' + server.address().port);
-});
+require('../app').listen( USER_PORT_NUMBER,USER_ID_ADDRESS);

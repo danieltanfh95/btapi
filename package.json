@@ -21,22 +21,24 @@
     }
   },
   "license": "ISC",
+  "devDependencies":{
+    "node-stopwatch": "0.0.1",
+    "nodemon": "^1.7.1",
+    "debug": "~2.2.0",   
+    "chai": "^3.3.0", 
+    "morgan": "~1.6.1",
+    "mocha": "^2.3.3",
+    "blanket": "^1.1.7"
+  },
   "dependencies": {
-    "blanket": "^1.1.7",
     "body-parser": "~1.14.1",
     "braces": "^1.8.2",
-    "chai": "^3.3.0",
     "cheerio": "~0.19.0",
     "compression": "^1.6.0",
     "cookie-parser": "~1.4.0",
-    "debug": "~2.2.0",
     "express": "~4.13.3",
     "jade": "~1.11.0",
     "marked": "~0.3.3",
-    "mocha": "^2.3.3",
-    "morgan": "~1.6.1",
-    "node-stopwatch": "0.0.1",
-    "nodemon": "^1.7.1",
     "request": "^2.64.0",
     "serve-favicon": "~2.3.0"
   }

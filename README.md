@@ -33,7 +33,9 @@ This API uses NodeJS, [ExpressJS](http://expressjs.com/) for the backend, [Cheer
 For full list of modules used, look at [package.json](https://github.com/Shadowys/btapi/blob/master/package.json).
 
 ###Development
-Clone the repo, or download the zip. Run `npm start` or `nodemon ./bin/www` to start the local server. Currently the main bulk of the logic lies in [`api.js`](https://github.com/Shadowys/btapi/blob/master/routes/api.js). 
+Clone the repo, or download the zip. Run `npm run devstart` to start a simple server.
+`npm start` is for production use only. (Note: might use forever in the future.)
+Currently the main bulk of the logic lies in [`api.js`](https://github.com/Shadowys/btapi/blob/master/routes/api.js). 
 Note that you may need some proficiency in jQuery to use Cheerio.
 
 The API is now being used in an [iOS app for Baka Tsuki (still in development)](https://github.com/AzSiAz/LN-Reader). I am in the process of asking for permission to be hosted on Baka Tsuki itself.
