@@ -349,13 +349,13 @@ novels.seriesTitleFilterByDownload = function (postdata,res){
         //Completed Preloading of Data
 
         //Get data about available volumes from the toc
-        var one_off=!$("#toc ul li").text().match(/volume/i)? true: false;
+        var one_off=$("#toc ul li").children('li :contains('+data.title.replace(/_/g," ")+')').parent().children("ul").text()=="";
         data.one_off=one_off;
         $("#toc ul li").each(function(){   
           //Notes that each page format has its own quirks and the program attempts to match all of them
           if((($(this).text().match(/[\'\"]+ series|by| story$| stories|miscellaneous|full| Story Arc /i) && 
                !$(this).text().match(/miscellaneous notes/i)) || 
-              (one_off && $(this).text().match(new RegExp(data.title.replace("_"," "), 'gi')))) && 
+              (one_off && $(this).text().match(new RegExp(data.title.replace(/_/g," "), 'gi')))) && 
               $(this).hasClass("toclevel-1")) {       
             //Note: This matches any title that remotely looks like a link to the volumes, e.g. Shakugan no Shana
             var volumelist=$(this).text().split(/\n/g).filter(function(n){ return n != "" });

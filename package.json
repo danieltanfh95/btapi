@@ -5,6 +5,7 @@
   "main": "bin/www",
   "scripts": {
     "start": "node ./bin/www",
+    "devstart":"./node_modules/.bin/nodemon ./bin/www",
     "test": "./node_modules/.bin/mocha --reporter spec",
     "coverage-report": "./node_modules/.bin/mocha --reporter spec --require blanket -R html-cov > coverage.html"
   },
@@ -13,14 +14,17 @@
     "npm": "2.11.3"
   },
   "config": {
-      "blanket": {
-        "pattern": ["routes"]
-      }
+    "blanket": {
+      "pattern": [
+        "routes"
+      ]
+    }
   },
   "license": "ISC",
   "dependencies": {
     "blanket": "^1.1.7",
     "body-parser": "~1.14.1",
+    "braces": "^1.8.2",
     "chai": "^3.3.0",
     "cheerio": "~0.19.0",
     "compression": "^1.6.0",
