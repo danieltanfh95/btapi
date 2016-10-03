@@ -1,0 +1,37 @@
+body {
+  padding: 100px;
+  font-size: 16px ;
+}
+
+code {
+  font-size: 16px;
+}
+
+.hide{
+  display: none;
+}
+#toc{
+  width: 100%;
+  background-color: aliceblue;
+}
+@media(max-width: 768px){
+  html {
+    padding-top: 50px;
+  }
+  body {
+    padding: 20px;
+  }
+  .nav.navbar-nav{
+    overflow: hidden;
+    margin: 0px;
+    background-color: white;
+  }
+  .collapse.navbar-collapse{   
+    box-shadow: 2px 2px 2px #666666;
+  }
+}
+.tooltip > .tooltip-inner {background-color: black;}
+.tooltip.in {
+  opacity: 0.95;
+  filter: alpha(opacity=95);
+}
